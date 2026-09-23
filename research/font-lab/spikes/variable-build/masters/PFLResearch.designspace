@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<designspace format="5.0">
+  <axes>
+    <axis tag="wght" name="Weight" minimum="100" maximum="180" default="100"/>
+  </axes>
+  <sources>
+    <source filename="Light.ufo" name="Light" familyname="PFL Research Original" stylename="Light">
+      <lib copy="1"/>
+      <groups copy="1"/>
+      <features copy="1"/>
+      <info copy="1"/>
+      <location>
+        <dimension name="Weight" xvalue="100"/>
+      </location>
+    </source>
+    <source filename="Bold.ufo" name="Bold" familyname="PFL Research Original" stylename="Bold">
+      <location>
+        <dimension name="Weight" xvalue="180"/>
+      </location>
+    </source>
+  </sources>
+</designspace>

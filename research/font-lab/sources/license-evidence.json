@@ -1,0 +1,204 @@
+[
+  {
+    "repo": "metaflop/metaflop-www",
+    "path": "license",
+    "url": "https://raw.githubusercontent.com/metaflop/metaflop-www/036c26b9f58f1264dba61d3818b7fae6869141e7/license",
+    "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "bytes": 35147,
+    "firstLines": [
+      "                    GNU GENERAL PUBLIC LICENSE",
+      "                       Version 3, 29 June 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  {
+    "repo": "metaflop/metaflop-font-bespoke",
+    "path": "font.mf",
+    "url": "https://raw.githubusercontent.com/metaflop/metaflop-font-bespoke/35a9ff885fd3bb4e503b31910f347125df7d978a/font.mf",
+    "sha256": "561eea77fd6fb36e7109501e2073f4fff83c479954fbf84c7b4ef0534dfb67d2",
+    "bytes": 3132,
+    "firstLines": [
+      "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+      "%                                                                         %",
+      "% MF Bespoke v1.9                                                         %",
+      "% \u00a9 2012-2016 by Marco Mueller and Simon Egli                             %",
+      "% thanks to Linus Roemer, Alexis Reigel, Theofilo Furtado                 %"
+    ]
+  },
+  {
+    "repo": "fontra/fontra",
+    "path": "LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/fontra/fontra/65eb043dbac9e41482ab40034b26757e2541e39d/LICENSE.txt",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "bytes": 35149,
+    "firstLines": [
+      "                    GNU GENERAL PUBLIC LICENSE",
+      "                       Version 3, 29 June 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  {
+    "repo": "fonttools/fonttools",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/fonttools/fonttools/0fccde31e86ce321fb5487f8bebf7e87d2dff318/LICENSE",
+    "sha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383",
+    "bytes": 1072,
+    "firstLines": [
+      "MIT License",
+      "",
+      "Copyright (c) 2017 Just van Rossum",
+      "",
+      "Permission is hereby granted, free of charge, to any person obtaining a copy"
+    ]
+  },
+  {
+    "repo": "googlefonts/fontmake",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/googlefonts/fontmake/92f6ea76ef4dde359d578738a99bbab5bdec3ef7/LICENSE",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "bytes": 11357,
+    "firstLines": [
+      "                                 Apache License",
+      "                           Version 2.0, January 2004",
+      "                        http://www.apache.org/licenses/",
+      "",
+      "   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION"
+    ]
+  },
+  {
+    "repo": "opentypejs/opentype.js",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/opentypejs/opentype.js/5d65b6dcfab5115f90d375f8ba6b7942fdaa0138/LICENSE",
+    "sha256": "a5b87c9bc191e7f9c06b07bd7cbbed3ed846dfdb50e859484b2c245aa1ab2e61",
+    "bytes": 1085,
+    "firstLines": [
+      "The MIT License (MIT)",
+      "",
+      "Copyright (c) 2020 Frederik De Bleser",
+      "",
+      "Permission is hereby granted, free of charge, to any person obtaining a copy of"
+    ]
+  },
+  {
+    "repo": "harfbuzz/harfbuzz",
+    "path": "COPYING",
+    "url": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/b3bab62307017934dd7f532c52a696fefb12b3ad/COPYING",
+    "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+    "bytes": 1971,
+    "firstLines": [
+      "HarfBuzz is licensed under the so-called \"Old MIT\" license.  Details follow.",
+      "For parts of HarfBuzz that are licensed under different licenses see individual",
+      "files names COPYING in subdirectories where applicable.",
+      "",
+      "Copyright \u00a9 2010-2022  Google, Inc."
+    ]
+  },
+  {
+    "repo": "glyphr-studio/Glyphr-Studio-2",
+    "path": "LICENSE-gpl-3.0.txt",
+    "url": "https://raw.githubusercontent.com/glyphr-studio/Glyphr-Studio-2/b351b7798ac17cfcac557a787913e4d0983f3b99/LICENSE-gpl-3.0.txt",
+    "sha256": "4d383a04fb2e81b79012eafe0420b1b60a0c097f4193c27d083b7c50af2f337f",
+    "bytes": 35145,
+    "firstLines": [
+      "                    GNU GENERAL PUBLIC LICENSE",
+      "                      Version 3, 29 June 2007",
+      "",
+      " Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>",
+      " Everyone is permitted to copy and distribute verbatim copies"
+    ]
+  },
+  {
+    "repo": "fontforge/fontforge",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/fontforge/fontforge/2d950099fa4b9ee3a3b9faabd048af8f91e8db92/LICENSE",
+    "sha256": "cd2401c1c2e1994a575ad8a0bf91237ca5e554b4d1eca2a15d4dd7fe7553be83",
+    "bytes": 10015,
+    "firstLines": [
+      "# FontForge Licensing",
+      "",
+      "FontForge is available as a whole under the terms of the [GNU GPL](http://www.gnu.org/copyleft/gpl.html), version",
+      "3 or any later version. ",
+      "However, almost all of its parts are available under the \"revised BSD license\" ([pdf](http://www.law.yi.org/~sfllaw/talks/bsd.pdf)) because FontForge was mostly written by George Williams, using that license."
+    ]
+  },
+  {
+    "repo": "johanmattssonm/birdfont",
+    "path": "GPLv3.txt",
+    "url": "https://raw.githubusercontent.com/johanmattssonm/birdfont/9865e6611e0bf00cbc5742ae1aab6eca4d04f072/GPLv3.txt",
+    "sha256": "67d5f60517e79c6d4b209346e4398daf9b69ccdb4e7fcab82294f50465f1931f",
+    "bytes": 34620,
+    "firstLines": [
+      "GNU GENERAL PUBLIC LICENSE",
+      "",
+      "Version 3, 29 June 2007",
+      "",
+      "Copyright \u00a9 2007 Free Software Foundation, Inc. <http://fsf.org/>"
+    ]
+  },
+  {
+    "repo": "arrowtype/recursive",
+    "path": "OFL.txt",
+    "url": "https://raw.githubusercontent.com/arrowtype/recursive/6d491202cea5cf6a493ef710cbef2527b9b08939/OFL.txt",
+    "sha256": "f9f539cf7549bd417159dbdb9c400943a5b60a7366c2c6fbde9f095173d82479",
+    "bytes": 4389,
+    "firstLines": [
+      "Copyright 2020 The Recursive Project Authors (https://github.com/arrowtype/recursive)",
+      "",
+      "This Font Software is licensed under the SIL Open Font License, Version 1.1.",
+      "This license is copied below, and is also available with a FAQ at:",
+      "http://scripts.sil.org/OFL"
+    ]
+  },
+  {
+    "repo": "mabugis/Folent",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/mabugis/Folent/b819090f4ab286c51264d266fde1a3fce126bcea/LICENSE",
+    "sha256": "af8a89e842ff2cecccf58397c649966876930698580eae40315bb12cfef8f61c",
+    "bytes": 1064,
+    "firstLines": [
+      "MIT License",
+      "",
+      "Copyright (c) 2026 Mubarak",
+      "",
+      "Permission is hereby granted, free of charge, to any person obtaining a copy"
+    ]
+  },
+  {
+    "repo": "googlefonts/fontc",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/googlefonts/fontc/bd4fcb09aa60771510f776a574c18454ae379a55/LICENSE",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "bytes": 11357,
+    "firstLines": [
+      "                                 Apache License",
+      "                           Version 2.0, January 2004",
+      "                        http://www.apache.org/licenses/",
+      "",
+      "   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION"
+    ]
+  },
+  {
+    "repo": "coldtype/coldtype",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/coldtype/coldtype/a74948904732aee2071158a44ed47688e0ee607a/LICENSE",
+    "sha256": "f278b106c541fb8a948f68b104e07472cbb10c4086665bdde38f72afc7651fc4",
+    "bytes": 11397,
+    "firstLines": [
+      "Copyright 2020 \u2014\u00a0Goodhertz, Inc.",
+      "---",
+      "                                 Apache License",
+      "                           Version 2.0, January 2004",
+      "                        http://www.apache.org/licenses/"
+    ]
+  },
+  {
+    "repo": "unified-font-object/ufo-spec",
+    "path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/unified-font-object/ufo-spec/ffb351f0248a4670e9223bb7d13c8be443eb392c/LICENSE",
+    "error": "HTTP Error 404: Not Found"
+  }
+]

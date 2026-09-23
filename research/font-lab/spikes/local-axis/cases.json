@@ -1,0 +1,55 @@
+[
+  {
+    "glyph": "H",
+    "globalWeight": 60,
+    "paths": [
+      "M40 40h60v320h-60z",
+      "M300 40h60v320h-60z",
+      "M100 160.0h200v60h-200z"
+    ]
+  },
+  {
+    "glyph": "H",
+    "globalWeight": 100,
+    "paths": [
+      "M40 40h100v320h-100z",
+      "M260 40h100v320h-100z",
+      "M140 140.0h120v100h-120z"
+    ]
+  },
+  {
+    "glyph": "O",
+    "globalWeight": 60,
+    "localCounter": 1.0,
+    "paths": [
+      "M40 40h320v320H40z M100.0 100.0v200.0h200.0v-200.0z"
+    ]
+  },
+  {
+    "glyph": "O",
+    "globalWeight": 60,
+    "localCounter": 0.5,
+    "paths": [
+      "M40 40h320v320H40z M115.0 115.0v170.0h170.0v-170.0z"
+    ]
+  },
+  {
+    "glyph": "a",
+    "globalWeight": 60,
+    "switch": "single",
+    "paths": [
+      "M40 160 Q40 100 120 100 Q200 100 200 160 V360 H40 Z",
+      "M200 100 h60v260h-60z"
+    ]
+  },
+  {
+    "glyph": "a",
+    "globalWeight": 60,
+    "switch": "double",
+    "paths": [
+      "M40 160 Q40 100 120 100 Q200 100 200 160 V360 H40 Z",
+      "M200 100 h60v260h-60z",
+      "M120 100 Q120 40 240 40 L240 75 Q170 75 170 110 Z"
+    ]
+  }
+]

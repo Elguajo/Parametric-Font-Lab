@@ -1,0 +1,783 @@
+{
+  "schemaVersion": 1,
+  "accessedAt": "2026-09-23",
+  "phase": "0-research",
+  "status": "research-complete-with-documented-limitations",
+  "sources": [
+    {
+      "type": "user-reference",
+      "path": "research/font-lab/metaflop/screenshots/metaflop-modulator-singlefile.html",
+      "use": "DOM/CSS static inspection"
+    },
+    {
+      "type": "user-reference",
+      "path": "research/font-lab/metaflop/screenshots/metaflop-modulator-fullpage.png",
+      "use": "visual layout measurement"
+    },
+    {
+      "type": "official-site",
+      "url": "https://www.metaflop.com/"
+    },
+    {
+      "type": "official-font-page",
+      "url": "https://www.metaflop.com/metafonts/bespoke"
+    }
+  ],
+  "repositories": [
+    {
+      "repo": "metaflop/metaflop-www",
+      "url": "https://github.com/metaflop/metaflop-www",
+      "sha": "036c26b9f58f1264dba61d3818b7fae6869141e7",
+      "error": null,
+      "role": "server web app reference",
+      "license": "GPL-3.0",
+      "licensePath": "license",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/metaflop/metaflop-www/036c26b9f58f1264dba61d3818b7fae6869141e7/license",
+      "licenseEvidenceSha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "master"
+    },
+    {
+      "repo": "metaflop/metaflop-font-bespoke",
+      "url": "https://github.com/metaflop/metaflop-font-bespoke",
+      "sha": "35a9ff885fd3bb4e503b31910f347125df7d978a",
+      "error": null,
+      "role": "METAFONT source reference",
+      "license": "GPL-3.0-or-later (source header; no root license file)",
+      "licensePath": "font.mf",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/metaflop/metaflop-font-bespoke/35a9ff885fd3bb4e503b31910f347125df7d978a/font.mf",
+      "licenseEvidenceSha256": "561eea77fd6fb36e7109501e2073f4fff83c479954fbf84c7b4ef0534dfb67d2",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "master"
+    },
+    {
+      "repo": "fontra/fontra",
+      "url": "https://github.com/fontra/fontra",
+      "sha": "65eb043dbac9e41482ab40034b26757e2541e39d",
+      "error": null,
+      "role": "browser variable-font editor reference",
+      "license": "GPL-3.0",
+      "licensePath": "LICENSE.txt",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/fontra/fontra/65eb043dbac9e41482ab40034b26757e2541e39d/LICENSE.txt",
+      "licenseEvidenceSha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "fonttools/fonttools",
+      "url": "https://github.com/fonttools/fonttools",
+      "sha": "0fccde31e86ce321fb5487f8bebf7e87d2dff318",
+      "error": null,
+      "role": "Python compile/validation",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/fonttools/fonttools/0fccde31e86ce321fb5487f8bebf7e87d2dff318/LICENSE",
+      "licenseEvidenceSha256": "6787208f83f659ccbc2223b2fde952ffa6f7e8aca62f1a8a2bf5bc51bb1b2383",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "googlefonts/fontmake",
+      "url": "https://github.com/googlefonts/fontmake",
+      "sha": "92f6ea76ef4dde359d578738a99bbab5bdec3ef7",
+      "error": null,
+      "role": "Python build orchestrator",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/googlefonts/fontmake/92f6ea76ef4dde359d578738a99bbab5bdec3ef7/LICENSE",
+      "licenseEvidenceSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "opentypejs/opentype.js",
+      "url": "https://github.com/opentypejs/opentype.js",
+      "sha": "5d65b6dcfab5115f90d375f8ba6b7942fdaa0138",
+      "error": null,
+      "role": "browser outline parser",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/opentypejs/opentype.js/5d65b6dcfab5115f90d375f8ba6b7942fdaa0138/LICENSE",
+      "licenseEvidenceSha256": "a5b87c9bc191e7f9c06b07bd7cbbed3ed846dfdb50e859484b2c245aa1ab2e61",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "master"
+    },
+    {
+      "repo": "harfbuzz/harfbuzz",
+      "url": "https://github.com/harfbuzz/harfbuzz",
+      "sha": "b3bab62307017934dd7f532c52a696fefb12b3ad",
+      "error": null,
+      "role": "text shaping",
+      "license": "Old MIT style with subdirectory exceptions",
+      "licensePath": "COPYING",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/b3bab62307017934dd7f532c52a696fefb12b3ad/COPYING",
+      "licenseEvidenceSha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "glyphr-studio/Glyphr-Studio-2",
+      "url": "https://github.com/glyphr-studio/Glyphr-Studio-2",
+      "sha": "b351b7798ac17cfcac557a787913e4d0983f3b99",
+      "error": null,
+      "role": "browser editor reference",
+      "license": "GPL-3.0",
+      "licensePath": "LICENSE-gpl-3.0.txt",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/glyphr-studio/Glyphr-Studio-2/b351b7798ac17cfcac557a787913e4d0983f3b99/LICENSE-gpl-3.0.txt",
+      "licenseEvidenceSha256": "4d383a04fb2e81b79012eafe0420b1b60a0c097f4193c27d083b7c50af2f337f",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "fontforge/fontforge",
+      "url": "https://github.com/fontforge/fontforge",
+      "sha": "2d950099fa4b9ee3a3b9faabd048af8f91e8db92",
+      "error": null,
+      "role": "desktop inspector reference",
+      "license": "GPL-3.0-or-later whole program; mixed file licenses",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/fontforge/fontforge/2d950099fa4b9ee3a3b9faabd048af8f91e8db92/LICENSE",
+      "licenseEvidenceSha256": "cd2401c1c2e1994a575ad8a0bf91237ca5e554b4d1eca2a15d4dd7fe7553be83",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "master"
+    },
+    {
+      "repo": "johanmattssonm/birdfont",
+      "url": "https://github.com/johanmattssonm/birdfont",
+      "sha": "9865e6611e0bf00cbc5742ae1aab6eca4d04f072",
+      "error": null,
+      "role": "desktop editor reference",
+      "license": "GPL-3.0",
+      "licensePath": "GPLv3.txt",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/johanmattssonm/birdfont/9865e6611e0bf00cbc5742ae1aab6eca4d04f072/GPLv3.txt",
+      "licenseEvidenceSha256": "67d5f60517e79c6d4b209346e4398daf9b69ccdb4e7fcab82294f50465f1931f",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "master"
+    },
+    {
+      "repo": "arrowtype/recursive",
+      "url": "https://github.com/arrowtype/recursive",
+      "sha": "6d491202cea5cf6a493ef710cbef2527b9b08939",
+      "error": null,
+      "role": "variable font source architecture reference",
+      "license": "OFL-1.1",
+      "licensePath": "OFL.txt",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/arrowtype/recursive/6d491202cea5cf6a493ef710cbef2527b9b08939/OFL.txt",
+      "licenseEvidenceSha256": "f9f539cf7549bd417159dbdb9c400943a5b60a7366c2c6fbde9f095173d82479",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "mabugis/Folent",
+      "url": "https://github.com/mabugis/Folent",
+      "sha": "b819090f4ab286c51264d266fde1a3fce126bcea",
+      "error": null,
+      "role": "visual morph experiment",
+      "license": "MIT",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/mabugis/Folent/b819090f4ab286c51264d266fde1a3fce126bcea/LICENSE",
+      "licenseEvidenceSha256": "af8a89e842ff2cecccf58397c649966876930698580eae40315bb12cfef8f61c",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "googlefonts/fontc",
+      "url": "https://github.com/googlefonts/fontc",
+      "sha": "bd4fcb09aa60771510f776a574c18454ae379a55",
+      "error": null,
+      "role": "future alternative compiler",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/googlefonts/fontc/bd4fcb09aa60771510f776a574c18454ae379a55/LICENSE",
+      "licenseEvidenceSha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "coldtype/coldtype",
+      "url": "https://github.com/coldtype/coldtype",
+      "sha": "a74948904732aee2071158a44ed47688e0ee607a",
+      "error": null,
+      "role": "generative typography reference",
+      "license": "Apache-2.0",
+      "licensePath": "LICENSE",
+      "licenseEvidenceUrl": "https://raw.githubusercontent.com/coldtype/coldtype/a74948904732aee2071158a44ed47688e0ee607a/LICENSE",
+      "licenseEvidenceSha256": "f278b106c541fb8a948f68b104e07472cbb10c4086665bdde38f72afc7651fc4",
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "main"
+    },
+    {
+      "repo": "unified-font-object/ufo-spec",
+      "url": "https://github.com/unified-font-object/ufo-spec",
+      "sha": "ffb351f0248a4670e9223bb7d13c8be443eb392c",
+      "error": null,
+      "role": "UFO specification",
+      "license": "unconfirmed; no root LICENSE found",
+      "licensePath": null,
+      "licenseEvidenceUrl": null,
+      "licenseEvidenceSha256": null,
+      "availability": "HEAD resolved by git ls-remote on access date",
+      "defaultBranch": "gh-pages"
+    }
+  ],
+  "licenses": [
+    {
+      "repo": "metaflop/metaflop-www",
+      "license": "GPL-3.0",
+      "sourcePath": "license",
+      "sourceUrl": "https://raw.githubusercontent.com/metaflop/metaflop-www/036c26b9f58f1264dba61d3818b7fae6869141e7/license",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "metaflop/metaflop-font-bespoke",
+      "license": "GPL-3.0-or-later (source header; no root license file)",
+      "sourcePath": "font.mf",
+      "sourceUrl": "https://raw.githubusercontent.com/metaflop/metaflop-font-bespoke/35a9ff885fd3bb4e503b31910f347125df7d978a/font.mf",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "fontra/fontra",
+      "license": "GPL-3.0",
+      "sourcePath": "LICENSE.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/fontra/fontra/65eb043dbac9e41482ab40034b26757e2541e39d/LICENSE.txt",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "fonttools/fonttools",
+      "license": "MIT",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/fonttools/fonttools/0fccde31e86ce321fb5487f8bebf7e87d2dff318/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "googlefonts/fontmake",
+      "license": "Apache-2.0",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/googlefonts/fontmake/92f6ea76ef4dde359d578738a99bbab5bdec3ef7/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "opentypejs/opentype.js",
+      "license": "MIT",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/opentypejs/opentype.js/5d65b6dcfab5115f90d375f8ba6b7942fdaa0138/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "harfbuzz/harfbuzz",
+      "license": "Old MIT style with subdirectory exceptions",
+      "sourcePath": "COPYING",
+      "sourceUrl": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/b3bab62307017934dd7f532c52a696fefb12b3ad/COPYING",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "glyphr-studio/Glyphr-Studio-2",
+      "license": "GPL-3.0",
+      "sourcePath": "LICENSE-gpl-3.0.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/glyphr-studio/Glyphr-Studio-2/b351b7798ac17cfcac557a787913e4d0983f3b99/LICENSE-gpl-3.0.txt",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "fontforge/fontforge",
+      "license": "GPL-3.0-or-later whole program; mixed file licenses",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/fontforge/fontforge/2d950099fa4b9ee3a3b9faabd048af8f91e8db92/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "johanmattssonm/birdfont",
+      "license": "GPL-3.0",
+      "sourcePath": "GPLv3.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/johanmattssonm/birdfont/9865e6611e0bf00cbc5742ae1aab6eca4d04f072/GPLv3.txt",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "arrowtype/recursive",
+      "license": "OFL-1.1",
+      "sourcePath": "OFL.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/arrowtype/recursive/6d491202cea5cf6a493ef710cbef2527b9b08939/OFL.txt",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "mabugis/Folent",
+      "license": "MIT",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/mabugis/Folent/b819090f4ab286c51264d266fde1a3fce126bcea/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "googlefonts/fontc",
+      "license": "Apache-2.0",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/googlefonts/fontc/bd4fcb09aa60771510f776a574c18454ae379a55/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "coldtype/coldtype",
+      "license": "Apache-2.0",
+      "sourcePath": "LICENSE",
+      "sourceUrl": "https://raw.githubusercontent.com/coldtype/coldtype/a74948904732aee2071158a44ed47688e0ee607a/LICENSE",
+      "verification": "direct-file"
+    },
+    {
+      "repo": "unified-font-object/ufo-spec",
+      "license": "unconfirmed; no root LICENSE found",
+      "sourcePath": null,
+      "sourceUrl": null,
+      "verification": "unconfirmed"
+    }
+  ],
+  "uiComponents": [
+    "navigation",
+    "font selector",
+    "anatomy toggle",
+    "glyph/chart toggle",
+    "parameter group",
+    "slider",
+    "numeric adjuster",
+    "reset",
+    "randomize",
+    "undo",
+    "glyph preview",
+    "glyph chooser",
+    "alphabet chart",
+    "typewriter",
+    "share",
+    "download"
+  ],
+  "metaflopParameters": [
+    {
+      "internal": "unit_width",
+      "label": "unit width",
+      "min": 0.75,
+      "default": 1.4,
+      "max": 2,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "pen_width",
+      "label": "pen width",
+      "min": 0.1,
+      "default": 0.9,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "cap_height",
+      "label": "cap height",
+      "min": 0.75,
+      "default": 0.9,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "bar_height",
+      "label": "bar height",
+      "min": 0.25,
+      "default": 0.5,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "ascender_height",
+      "label": "asc. height",
+      "min": 0.75,
+      "default": 0.95,
+      "max": 1.25,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "descender_height",
+      "label": "desc. height",
+      "min": 0.25,
+      "default": 0.3,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "x_height",
+      "label": "x-height",
+      "min": 0.5,
+      "default": 0.65,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "horizontal_increase",
+      "label": "horiz. increase",
+      "min": 0,
+      "default": 0,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "vertical_increase",
+      "label": "vert. increase",
+      "min": 0,
+      "default": 0,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "contrast",
+      "label": "contrast",
+      "min": 1,
+      "default": 1.1,
+      "max": 2,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "superness",
+      "label": "superness",
+      "min": 0.25,
+      "default": 0.74,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "slant",
+      "label": "slanting",
+      "min": -0.75,
+      "default": 0,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "aperture",
+      "label": "aperture",
+      "min": 0,
+      "default": 0.6,
+      "max": 0.75,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "corner",
+      "label": "corner",
+      "min": 0,
+      "default": 1,
+      "max": 1.5,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "overshoot",
+      "label": "overshoot",
+      "min": 0,
+      "default": 0.1,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    },
+    {
+      "internal": "taper",
+      "label": "taper",
+      "min": 0,
+      "default": 0.5,
+      "max": 1,
+      "step": 0.01,
+      "scope": "global"
+    }
+  ],
+  "candidateEngines": [
+    {
+      "repo": "metaflop/metaflop-www",
+      "role": "server web app reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "metaflop/metaflop-font-bespoke",
+      "role": "METAFONT source reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "fontra/fontra",
+      "role": "browser variable-font editor reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "fonttools/fonttools",
+      "role": "Python compile/validation",
+      "recommendation": "dependency candidate"
+    },
+    {
+      "repo": "googlefonts/fontmake",
+      "role": "Python build orchestrator",
+      "recommendation": "dependency candidate"
+    },
+    {
+      "repo": "opentypejs/opentype.js",
+      "role": "browser outline parser",
+      "recommendation": "dependency candidate"
+    },
+    {
+      "repo": "harfbuzz/harfbuzz",
+      "role": "text shaping",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "glyphr-studio/Glyphr-Studio-2",
+      "role": "browser editor reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "fontforge/fontforge",
+      "role": "desktop inspector reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "johanmattssonm/birdfont",
+      "role": "desktop editor reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "arrowtype/recursive",
+      "role": "variable font source architecture reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "mabugis/Folent",
+      "role": "visual morph experiment",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "googlefonts/fontc",
+      "role": "future alternative compiler",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "coldtype/coldtype",
+      "role": "generative typography reference",
+      "recommendation": "reference or deferred"
+    },
+    {
+      "repo": "unified-font-object/ufo-spec",
+      "role": "UFO specification",
+      "recommendation": "reference or deferred"
+    }
+  ],
+  "recommendedStack": {
+    "canonicalSource": "versioned JSON",
+    "geometry": "original deterministic recipes",
+    "browserOutline": "opentype.js 2.0.0 proof; native text specimen",
+    "compile": "generated UFO/Designspace + fontmake/fontTools",
+    "variable": "curated weight axis after full-script compatibility",
+    "pck": "reuse existing .progressive routing, phase tracking and quality protocol"
+  },
+  "axes": [
+    {
+      "name": "Weight",
+      "tagProposal": "wght",
+      "mvp": true
+    },
+    {
+      "name": "Width",
+      "tagProposal": "wdth",
+      "mvp": true
+    },
+    {
+      "name": "X-height",
+      "tagProposal": "XHGT",
+      "mvp": true
+    },
+    {
+      "name": "Cap-height",
+      "tagProposal": "CPHT",
+      "mvp": false
+    },
+    {
+      "name": "Contrast",
+      "tagProposal": "CNTR",
+      "mvp": false
+    },
+    {
+      "name": "Roundness",
+      "tagProposal": "ROND",
+      "mvp": true
+    },
+    {
+      "name": "Superness",
+      "tagProposal": "SPRN",
+      "mvp": false
+    },
+    {
+      "name": "Aperture",
+      "tagProposal": "APRT",
+      "mvp": true
+    },
+    {
+      "name": "Terminal angle",
+      "tagProposal": "TRMA",
+      "mvp": false
+    },
+    {
+      "name": "Taper",
+      "tagProposal": "TAPR",
+      "mvp": false
+    },
+    {
+      "name": "Optical/Text-Display",
+      "tagProposal": "opsz",
+      "mvp": false
+    },
+    {
+      "name": "Mono/Proportional",
+      "tagProposal": "MONO",
+      "mvp": false
+    },
+    {
+      "name": "Tech/Neutral",
+      "tagProposal": "TECH",
+      "mvp": false
+    },
+    {
+      "name": "Soft/Sharp",
+      "tagProposal": "SOFT",
+      "mvp": false
+    }
+  ],
+  "structuralSwitches": [
+    "a:single/double",
+    "g:single/double",
+    "4:open/closed",
+    "0:plain/slashed/dotted",
+    "Q:tail variants",
+    "R:leg variants",
+    "1:foot/no foot",
+    "G:spur variants",
+    "terminal:flat/angled/rounded",
+    "Cyrillic:Д/Л/Ж/К/У/Ф/Я/д/л/т/б"
+  ],
+  "mvp": {
+    "engine": "original Geometric/Technical Sans",
+    "scripts": [
+      "Latin basic",
+      "Russian Cyrillic incl Ё/ё"
+    ],
+    "globalControls": [
+      "Weight",
+      "Width",
+      "X-height",
+      "Roundness",
+      "Aperture"
+    ],
+    "firstSwitches": [
+      "a single/double",
+      "0 plain/slashed"
+    ],
+    "formats": [
+      "JSON source",
+      "static OTF",
+      "static TTF",
+      "WOFF2"
+    ],
+    "variableFont": "Phase 2 after compatibility validation"
+  },
+  "spikes": {
+    "browserOutline": {
+      "status": "passed",
+      "parseMsObserved": 6,
+      "renderMsLastObserved": 0.2,
+      "fontGlyphs": 4
+    },
+    "variableBuild": {
+      "status": "passed",
+      "masters": 2,
+      "formats": [
+        "OTF",
+        "TTF",
+        "Variable TTF",
+        "WOFF2"
+      ]
+    },
+    "localAxis": {
+      "status": "passed",
+      "cases": 6,
+      "switchChangesTopology": true
+    }
+  },
+  "risks": [
+    "geometry complexity",
+    "self-intersections",
+    "master incompatibility",
+    "variable constraints",
+    "kerning",
+    "Cyrillic quality",
+    "browser performance",
+    "font parsing security",
+    "GPL contamination",
+    "derivative-font licensing",
+    "scope explosion",
+    "extreme-axis quality"
+  ],
+  "decisions": [
+    {
+      "id": "ADR-001",
+      "path": "decisions/ADR-001-metaflop-reference-only.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-002",
+      "path": "decisions/ADR-002-browser-preview-server-build.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-003",
+      "path": "decisions/ADR-003-json-canonical-source.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-004",
+      "path": "decisions/ADR-004-fontmake-pipeline.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-005",
+      "path": "decisions/ADR-005-opentype-preview.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-006",
+      "path": "decisions/ADR-006-variable-weight-first.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-007",
+      "path": "decisions/ADR-007-latin-cyrillic-co-design.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-008",
+      "path": "decisions/ADR-008-mono-separate-authored-family.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-009",
+      "path": "decisions/ADR-009-glyph-local-overrides.md",
+      "status": "Proposed for Phase 1"
+    },
+    {
+      "id": "ADR-010",
+      "path": "decisions/ADR-010-switch-recipe-families.md",
+      "status": "Proposed for Phase 1"
+    }
+  ],
+  "limitations": [
+    "local SingleFile browser URL blocked by browser security policy; static DOM/CSS plus screenshot used",
+    "full-font Latin/Cyrillic quality and variable compatibility not validated by tiny spikes",
+    "UFO specification prose license unconfirmed"
+  ],
+  "nextTask": "Phase 1a original cross-script vertical slice as specified in final/RESEARCH_REPORT.md §9"
+}

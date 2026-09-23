@@ -1085,3 +1085,13 @@ Research Phase считается завершённым только когда
 7. Список файлов, созданных/изменённых в repo.
 
 Не пересказывать весь research в сообщении — подробности должны быть в документах.
+
+---
+
+## Completion Record
+
+Status: COMPLETED 2026-09-23.
+
+Final report: `research/font-lab/final/RESEARCH_REPORT.md`; durable completion evidence: `.progressive/completions/00-research.md`.
+
+Outcome: Metaflop/source/license research, architecture/MVP/ADRs and three disposable spikes delivered. Validation: browser contour preview, two-master static/variable/WOFF2 build and global/local/switch proof observed; PCK audit passed. Dynamic SingleFile browser access was blocked by URL policy, so source JS plus static DOM/CSS and screenshot support the reverse-spec; UFO spec prose license remains unconfirmed. Phase 1 starts from the exact vertical slice in report §9; variable-font release and full Latin/Cyrillic quality still require implementation evidence.

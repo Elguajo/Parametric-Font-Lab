@@ -1,0 +1,7 @@
+# Metrics, spacing and kerning architecture
+
+Generate outlines before assigning sidebearings, but let width and weight inform both. `GlyphRecipe` emits ink bounds and an optical spacing class; script-specific rules determine left/right sidebearings from stem widths, counter rhythm and target text size. Round forms receive optical corrections; punctuation uses its own advance rules. Persist manual class corrections separately so regeneration does not overwrite them.
+
+Use left/right kerning groups (`@L_A`, `@R_V`, script qualified); create representative pairs plus exceptions in feature source. Interpolate kerning values across compatible masters only after group membership is stable. Evaluate punctuation, numerals, marks and cross-script contexts. Testing with shaped strings is required: metrics alone cannot reveal pair failures.
+
+Weight: as ink grows, sidebearings typically tighten or rebalance optically; never simply shrink all advances. Width: regenerate proportions and spacing, not affine scale alone. X/cap-height: recompute mark and line-height alignment; do not shift baseline. Mono: use a fixed target advance and redesign narrow/wide forms plus tabular punctuation; treat proportional→mono as a separate authored axis family after a source spike. A continuous mono control that only interpolates advances is insufficient. Export HVAR/metrics only when compilation proves stable advances. Phase 1 can ship curated static presets with manual kerning exceptions rather than claiming automatic high-quality kerning across all extremes.

@@ -1,0 +1,9 @@
+# Metaflop Modulator layout reverse-spec
+
+**Observed:** saved SingleFile from `https://www.metaflop.com/modulator` (2026-09-23), 2976×1656 full-page PNG, DOM/CSS static parse, and upstream `assets/stylesheets/{_variables,screen}.scss` at commit `036c26b`. The PNG is a 2× capture of an approximately 1488 px viewport. Browser UI access to the local `file:` URL was blocked by the browser security policy; no dynamic browser measurement is claimed.
+
+The layout is a centered **1000 CSS-px** content rail (`#main`, 10 px horizontal padding), beginning ~244 CSS px from the left of the capture. Fixed top navigation spans ~986 px. Content starts 77 px below top. `#col1` floats left at **259 px**, gap **31 px**; `#col2` is **710 px**. The latter holds two **339.5 px** preview boxes with **31 px** gutter: Glyph and Chart. Typewriter spans the full 710 px below, with 7 px vertical box spacing. The screenshot confirms these proportions within capture scaling.
+
+Left rail: Modulator controls over Parameters; parameters continue below fold. Right rail: Glyph and Chart side by side; Typewriter below. Section labels are tabs visually overlapping pale panel backgrounds. The screenshot shows no persistent footer or overlay. Navigation is fixed; the document scrolls, not individual panels. The font preview is visible at the top but does not stay sticky while scrolling the tall parameter rail.
+
+No responsive breakpoint appears in the inspected SCSS (`rg @media`); fixed widths imply horizontal overflow or clipping at narrow widths. Mobile behavior cannot be established from one desktop capture and was not verified dynamically. Hierarchy is top navigation → control and preview columns → lower long-form specimen. Reuse the immediate parameter-to-result relation, but make the future workbench responsive and keep the live specimen visible during long edits.

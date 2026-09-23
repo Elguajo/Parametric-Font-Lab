@@ -1,0 +1,9 @@
+# V1 scope — Geometric/Technical Sans
+
+The candidate in `RESEARCH_SPEC.md` is too broad for one quality release: ten global controls, six switch families, A/B, presets, variable export and two scripts create a large combinatorial test surface. Split **V1 static quality** from **Phase 2 variable breadth**. Latin + Russian Cyrillic remain a single release gate; Cyrillic is authored concurrently, not backfilled.
+
+**V1 release:** original Geometric/Technical Sans; basic Latin (A–Z/a–z), digits, essential punctuation, Russian Cyrillic (А–Я/а–я + Ё/ё), marks and shared metrics; five validated global controls (weight, width, x-height, roundness, aperture) in curated safe ranges; local aperture/counter override for selected glyphs; `a` single/double and `0` plain/slashed as first switches. UI: live glyph, Latin/Cyrillic chart, editable typewriter, numeric+slider, reset/undo, curated presets, A/B comparison. Export: versioned project JSON, static OTF/TTF, WOFF2 after table/shape validation. Curated instances rather than unlimited sliders at arbitrary extremes may be necessary at release if quality cannot be maintained.
+
+**Phase 2:** compatible weight variable TTF first, then width and optical/text-display only after master compatibility and optical review; richer contrast, terminal, tech, mono amount and more switches after source/quality evidence. Variable TTF is proven technically by the spike, but V1 release must not promise it for the full repertoire without compatible Cyrillic and feature/metrics tests. Webfont packaging and notices must be validated.
+
+Out of scope V1: Serif/Slab/Blackletter/Script, Arabic/CJK, AI outlines, arbitrary font morphing, commercial font import, full Bézier editor, automatic perfect kerning, general multi-engine architecture. Definition of quality includes Cyrillic-aware review, small-size text proofs, extreme-axis matrix, contour checks and shaped specimen tests.

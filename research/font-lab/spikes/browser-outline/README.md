@@ -1,0 +1,7 @@
+# Spike A — browser outline rendering
+
+Uses the original CC0 Variable TTF from Spike B (generate it first), `opentype.js@2.0.0`, Playwright 1.58.0 and installed Google Chrome. Run `npm ci` then `npm run verify` in this folder. `verify.mjs` starts a local static server for **this disposable page**, drives headless Chromium, changes text and a width transform, checks path data/transform, and saves `proof.png`. The separate user-supplied Metaflop SingleFile was never served this way: browser security policy blocked that file URL, so its reverse-spec uses static DOM/CSS and the screenshot.
+
+Observed: 4-glyph font parsed in ~6 ms, last SVG path render ~0.2 ms on this machine; 3 renders, text path changed, transform `scale(1.2 1)`, zero page errors. These are single-run local timings, **not** bounds for Latin+Cyrillic or a promise of input latency. The page uses opentype.js paths for a glyph outline and native `@font-face` for live text. The preview-scale slider is a visual transform only, not a production width axis or valid exported outline transformation.
+
+Production suitability: opentype.js is useful for glyph inspection; native CSS text (and optional HarfBuzz) is better for shaped specimen. For real glyph counts, measure parse size, caching, Worker offload, shaping correctness and untrusted-font limits. `node_modules/` and generated build output are ignored; `proof.png` is the test capture.

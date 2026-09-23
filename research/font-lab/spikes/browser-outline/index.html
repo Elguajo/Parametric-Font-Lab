@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Disposable outline preview spike</title>
+<style>
+  @font-face { font-family: PFLProbe; src: url('../variable-build/out/variable/PFLResearch-VF.ttf'); }
+  body { font: 16px system-ui; max-width: 800px; margin: 2rem auto; }
+  label { display: block; margin: 1rem 0; }
+  svg { border: 1px solid #ccc; width: 100%; height: 240px; }
+  #specimen { font: 80px PFLProbe, sans-serif; transform-origin: left; }
+</style>
+<h1>Original CC0 outline preview</h1>
+<label>Text <input id="text" value="HOH" maxlength="12"></label>
+<label>Horizontal preview scale <input id="width" type="range" min="0.75" max="1.25" step="0.01" value="1"></label>
+<svg id="outline" viewBox="0 0 800 240" aria-label="Parsed font outline"></svg>
+<p id="specimen">HOH</p>
+<output id="status">Loading…</output>
+<script type="module">
+  import { parse } from './node_modules/opentype.js/dist/opentype.mjs';
+  const started = performance.now();
+  const response = await fetch('../variable-build/out/variable/PFLResearch-VF.ttf');
+  if (!response.ok) throw new Error(`font HTTP ${response.status}`);
+  const font = parse(await response.arrayBuffer());
+  const parsedMs = performance.now() - started;
+  const text = document.getElementById('text');
+  const width = document.getElementById('width');
+  const svg = document.getElementById('outline');
+  const specimen = document.getElementById('specimen');
+  const status = document.getElementById('status');
+  window.pflProbe = { parsedMs, renders: 0, lastRenderMs: 0, glyphs: font.numGlyphs };
+  function render() {
+    const began = performance.now();
+    const value = text.value || 'H';
+    const factor = Number(width.value);
+    const pathData = font.getPath(value, 10, 190, 190).toPathData(2);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathData);
+    path.setAttribute('fill', '#152a26');
+    path.setAttribute('transform', `scale(${factor} 1)`);
+    svg.replaceChildren(path);
+    specimen.textContent = value;
+    specimen.style.transform = `scaleX(${factor})`;
+    window.pflProbe.renders++;
+    window.pflProbe.lastRenderMs = performance.now() - began;
+    status.textContent = `${font.numGlyphs} glyphs; parse ${parsedMs.toFixed(1)} ms; render ${window.pflProbe.lastRenderMs.toFixed(1)} ms`;
+  }
+  text.addEventListener('input', render);
+  width.addEventListener('input', render);
+  render();
+</script>
+</html>

@@ -1,0 +1,3 @@
+# Source provenance
+
+`repositories.json` records public repository URL, Git HEAD SHA resolved by `git ls-remote` on 2026-09-23, role, directly verified license path and file SHA-256. `license-evidence.json` records raw-file fetch results without vendoring source or license text. All primary claims in research documents link to official site, repository file or documentation. Metaflop web and Bespoke were shallow-cloned under `/tmp` for source inspection; no clone is committed. A reachable HEAD does not by itself prove active maintenance. The UFO specification repository lacked a root LICENSE at that HEAD, so copying its prose/assets is excluded.

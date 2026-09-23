@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 440">
+<g transform="translate(0,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 40h60v320h-60z"/>
+<path d="M300 40h60v320h-60z"/>
+<path d="M100 160.0h200v60h-200z"/>
+</g>
+<g transform="translate(400,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 40h100v320h-100z"/>
+<path d="M260 40h100v320h-100z"/>
+<path d="M140 140.0h120v100h-120z"/>
+</g>
+<g transform="translate(800,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 40h320v320H40z M100.0 100.0v200.0h200.0v-200.0z"/>
+</g>
+<g transform="translate(1200,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 40h320v320H40z M115.0 115.0v170.0h170.0v-170.0z"/>
+</g>
+<g transform="translate(1600,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 160 Q40 100 120 100 Q200 100 200 160 V360 H40 Z"/>
+<path d="M200 100 h60v260h-60z"/>
+</g>
+<g transform="translate(2000,0)" fill="none" stroke="black" stroke-width="3">
+<path d="M40 160 Q40 100 120 100 Q200 100 200 160 V360 H40 Z"/>
+<path d="M200 100 h60v260h-60z"/>
+<path d="M120 100 Q120 40 240 40 L240 75 Q170 75 170 110 Z"/>
+</g>
+</svg>
