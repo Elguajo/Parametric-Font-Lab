@@ -1,0 +1,4 @@
+# Isolated compiler environment for the Phase 1a static export pipeline.
+fontmake==3.11.0
+ufoLib2==0.18.1
+brotli==1.1.0

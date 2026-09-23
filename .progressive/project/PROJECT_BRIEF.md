@@ -1,6 +1,6 @@
 # Project Brief — Parametric Font Lab
 
-Status: RESEARCHED; production not started
+Status: PHASE 1 IN PROGRESS; Phase 1a vertical slice implemented and verified
 
 ## Outcome
 Build an original browser workbench for designing and exporting a high-quality parametric Geometric/Technical Sans with live preview, source presets and production-safe font output.

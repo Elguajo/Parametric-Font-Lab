@@ -14,7 +14,7 @@ Phase 0 findings and proposed ADRs: `research/font-lab/final/RESEARCH_REPORT.md`
 - Production variable font release, arbitrary morphing, full Bézier editor and other style engines.
 
 ## Tasks
-- [ ] Implement and verify Phase 1a source/preview/export vertical slice.
+- [x] Implement and verify Phase 1a source/preview/export vertical slice.
 - [ ] Author and review complete V1 Latin + Russian Cyrillic glyph repertoire.
 - [ ] Add controlled UI, presets/A-B, spacing/kerning and static export validation.
 
@@ -33,3 +33,19 @@ Phase 0 findings and proposed ADRs: `research/font-lab/final/RESEARCH_REPORT.md`
 
 ## Completion Record
 Pending.
+
+## Phase 1a Execution Record — 2026-09-24
+
+Implemented the original eight-glyph vertical slice in `fontlab/project.json`: `H/O/a/0`
+and `Н/О/а/о`. The versioned JSON Schema rejects unknown fields, invalid ranges and invalid
+switches. The deterministic Python evaluator applies shared `weight`, scopes `counter` to
+Latin `O`, and selects a topology-distinct Latin `a` family without changing Cyrillic `а`.
+
+`web/` provides the responsive SVG outline, glyph chart and editable Latin/Cyrillic specimen.
+The isolated compiler writes derived UFO and Designspace sources, then static TTF, CFF OTF and
+WOFF2 to `build/`; generated artifacts are ignored. `npm test` passed six Python contract and
+geometry tests plus a Chrome preview/parity test. `npm run export` passed table, outline and cmap
+checks for all eight Unicode mappings with fontTools 4.66.0.
+
+Phase 1 remains active: full basic Latin/Russian Cyrillic repertoire, script proofing,
+metrics/kerning, presets and later quality review belong to Phase 1b.

@@ -1,0 +1,15 @@
+{
+  "name": "parametric-font-lab",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "setup": "python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.lock && npm ci && npx playwright install chromium",
+    "test:python": ".venv/bin/python -m unittest discover -s tests -v",
+    "test:browser": "node tests/browser-preview.test.mjs",
+    "test": "npm run test:python && npm run test:browser",
+    "export": ".venv/bin/python tools/build_font.py"
+  },
+  "devDependencies": {
+    "playwright": "1.58.0"
+  }
+}

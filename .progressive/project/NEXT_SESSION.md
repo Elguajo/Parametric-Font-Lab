@@ -5,12 +5,12 @@
 Status: RUNNABLE / GREEN
 
 Current phase: Phase 1 — Geometric/Technical Sans MVP.
-Just completed: Phase 0 research; see `research/font-lab/final/RESEARCH_REPORT.md` and `.progressive/completions/00-research.md`.
-Verification: three disposable spikes and PCK audit passed; evidence is in the completion report.
-Blockers: none for Phase 1a. Full-font type quality and variable compatibility are later phase gates.
+Just completed: Phase 1a source/preview/export vertical slice; evidence is in `.progressive/phases/01-technical-sans-mvp.md`.
+Verification: deterministic recipe, Chrome browser preview/parity and static UFO → Designspace → TTF/OTF/WOFF2 checks passed.
+Blockers: none for Phase 1b. Full-font type quality and variable compatibility remain later gates.
 
 ## Next action
-Implement and verify Phase 1a original cross-script vertical slice exactly as scoped in research report §9 and `.progressive/phases/01-technical-sans-mvp.md`.
+Plan and implement Phase 1b: the complete basic Latin + Russian Cyrillic repertoire, proof it per script, then add metrics, kerning and controlled presets/A-B.
 
 ## NEXT SESSION PROMPT
-Implement Phase 1a from `research/font-lab/final/RESEARCH_REPORT.md` §9. Read the active phase and proposed ADRs, preserve the original-source licensing boundary, build the minimal cross-script browser preview and static export with tests, then update PCK state from observed evidence.
+Continue Phase 1b from `.progressive/phases/01-technical-sans-mvp.md`. Preserve Phase 1a's original-source and deterministic-build boundaries; extend the repertoire only with authored recipes and prove Latin/Cyrillic metrics and shaping before adding presets or extra controls.

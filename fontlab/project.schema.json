@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parametric-font-lab.local/schema/project-1.json",
+  "title": "Parametric Font Lab project",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "glyphs"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+    "name": {"type": "string", "minLength": 1},
+    "engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version"],
+      "properties": {"id": {"const": "technical-sans"}, "version": {"const": "1.0"}}
+    },
+    "axes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["weight"],
+      "properties": {"weight": {"type": "number", "minimum": 40, "maximum": 160}}
+    },
+    "localOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["O"],
+      "properties": {
+        "O": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["counter"],
+          "properties": {"counter": {"type": "number", "minimum": 0.5, "maximum": 1.5}}
+        }
+      }
+    },
+    "switches": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["aConstruction"],
+      "properties": {"aConstruction": {"enum": ["single", "double"]}}
+    },
+    "glyphs": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "unicode", "script", "recipe"],
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "unicode": {"type": "integer", "minimum": 0, "maximum": 1114111},
+          "script": {"enum": ["Latn", "Cyrl"]},
+          "recipe": {"type": "string"}
+        }
+      }
+    }
+  }
+}

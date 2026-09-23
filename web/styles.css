@@ -1,0 +1,28 @@
+:root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; background: #111213; color: #f3f0e9; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+main { width: min(1280px, calc(100% - 32px)); margin: 0 auto; padding: 44px 0; }
+header { margin-bottom: 28px; }
+.eyebrow { color: #d6ff00; font-size: .75rem; font-weight: 700; letter-spacing: .16em; margin: 0 0 10px; }
+h1, h2, p { margin-top: 0; } h1 { font-size: clamp(2.1rem, 6vw, 4.4rem); line-height: .92; letter-spacing: -.06em; margin-bottom: 12px; }
+h2 { font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
+.summary, .scope { color: #b3b4ae; max-width: 42rem; line-height: 1.45; }
+.workbench { display: grid; grid-template-columns: minmax(210px, .7fr) minmax(330px, 1.3fr) minmax(210px, .7fr); border: 1px solid #3a3c39; background: #191a1a; }
+.workbench > * { min-width: 0; padding: 24px; }
+.controls, .chart-panel { border-right: 1px solid #3a3c39; }
+.controls label, .specimen-label { display: flex; justify-content: space-between; gap: 8px; font-size: .86rem; margin: 22px 0 8px; }
+input, select, textarea { width: 100%; accent-color: #d6ff00; }
+select, textarea { border: 1px solid #5c5e58; border-radius: 2px; background: #0d0e0e; color: inherit; padding: 9px; font: inherit; }
+.scope { font-size: .78rem; margin-top: 22px; }
+.preview-panel { background: #101111; }
+.outline-head { display: flex; justify-content: space-between; align-items: center; }
+#selected-name { color: #d6ff00; font-size: 1.8rem; font-weight: 700; }
+#outline { display: block; width: min(100%, 360px); height: 330px; margin: 6px auto 18px; background: #f3f0e9; }
+#outline path, .glyph path { fill: #111213; fill-rule: evenodd; }
+.specimen-preview { display: flex; flex-wrap: wrap; min-height: 76px; margin-top: 14px; padding: 8px; background: #f3f0e9; color: #111213; }
+.glyph { width: 46px; height: 58px; } .glyph.space { width: 14px; }
+.chart { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.glyph-button { display: grid; grid-template-columns: 1fr 24px; align-items: center; min-height: 78px; border: 1px solid #41433f; background: #1e201f; color: inherit; cursor: pointer; text-align: left; }
+.glyph-button[aria-pressed="true"] { border-color: #d6ff00; }.glyph-button svg { width: 100%; height: 64px; background: #f3f0e9; }.glyph-button span { text-align: center; }
+.error { min-height: 1.2em; color: #ff9b8d; font-size: .82rem; margin: 10px 0 0; }
+@media (max-width: 820px) { .workbench { grid-template-columns: 1fr; } .controls, .chart-panel { border-right: 0; border-bottom: 1px solid #3a3c39; } .chart { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

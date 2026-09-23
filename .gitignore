@@ -1,3 +1,10 @@
 .DS_Store
 .serena/
+.venv/
+node_modules/
+build/
+dist/
 __pycache__/
+*.py[cod]
+test-results/
+playwright-report/

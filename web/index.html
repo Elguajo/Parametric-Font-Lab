@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Parametric Font Lab — Phase 1a</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">PFL / PHASE 1A</p>
+        <h1>Technical Sans</h1>
+        <p class="summary">Original Latin + Cyrillic recipe preview. The export compiler is authoritative.</p>
+      </header>
+      <section class="workbench" aria-label="Parametric font controls and preview">
+        <form class="controls" id="controls">
+          <h2>Construction</h2>
+          <label for="weight">Shared weight <output id="weight-value">88</output></label>
+          <input id="weight" type="range" min="40" max="160" value="88" step="1">
+          <label for="counter">Latin O counter <output id="counter-value">1.00</output></label>
+          <input id="counter" type="range" min="0.5" max="1.5" value="1" step="0.05">
+          <label for="construction">Latin a construction</label>
+          <select id="construction">
+            <option value="double" selected>Double-storey</option>
+            <option value="single">Single-storey</option>
+          </select>
+          <p class="scope">O counter is local to Latin O. The a switch is discrete and does not alter Cyrillic а.</p>
+        </form>
+        <section class="preview-panel" aria-label="Outline and specimen preview">
+          <div class="outline-head"><h2>Outline preview</h2><span id="selected-name">H</span></div>
+          <svg id="outline" viewBox="0 0 680 1000" role="img" aria-label="Selected glyph outline"></svg>
+          <label class="specimen-label" for="specimen">Editable Latin / Cyrillic specimen</label>
+          <textarea id="specimen" rows="2">H O a 0 Н О а о</textarea>
+          <div id="specimen-preview" class="specimen-preview" aria-label="Rendered specimen"></div>
+          <p id="preview-error" class="error" role="alert"></p>
+        </section>
+        <section class="chart-panel" aria-label="Glyph chart">
+          <h2>Glyph chart</h2>
+          <div id="chart" class="chart"></div>
+        </section>
+      </section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
