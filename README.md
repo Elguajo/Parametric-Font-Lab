@@ -451,12 +451,19 @@ The implemented vertical slice is deliberately small: original recipes for `H/O/
 npm run setup
 npm test
 npm run export
-python3 -m http.server 8765 --directory web
+python3 -m http.server 8765 --bind 127.0.0.1 --directory .
 ```
 
-Open `http://127.0.0.1:8765` for the browser workbench. `requirements.lock` and
-`package-lock.json` pin the compiler and test dependency graphs. `npm run export` writes only
-ignored derived artifacts under `build/` (UFO, Designspace, TTF, OTF and WOFF2).
+Open `http://127.0.0.1:8765/web/` for the browser workbench. Adjust the sliders or numeric
+fields, download the resulting project JSON, then compile exactly those settings with:
+
+```sh
+npm run export -- --project /path/to/pfl-phase-1a-project.json
+```
+
+`requirements.lock` and `package-lock.json` pin the compiler and test dependency graphs.
+Each export writes derived UFO, Designspace, TTF, OTF, WOFF2 and a manifest under
+`build/<source-hash>/`. Exports leave unrelated files in `build/` untouched.
 
 The contours in `fontlab/project.json` are original project source; no external font outlines
 are imported. See `THIRD_PARTY_NOTICES.md` for compiler/test dependencies.

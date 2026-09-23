@@ -9,17 +9,33 @@ from __future__ import annotations
 from copy import deepcopy
 from hashlib import sha256
 import json
+import math
 from pathlib import Path
+import re
 from typing import Any
+
+from fontTools.misc.bezierTools import curveCurveIntersections, curveLineIntersections, splitCubicAtT
+from fontTools.pens.areaPen import AreaPen
 
 
 ROOT = Path(__file__).resolve().parent
 PROJECT_PATH = ROOT / "project.json"
 SCHEMA_PATH = ROOT / "project.schema.json"
+MAX_SOURCE_BYTES = 65536
 KAPPA = 0.5522847498307936
 WEIGHT_RANGE = (40.0, 160.0)
 COUNTER_RANGE = (0.5, 1.5)
 VALID_A_CONSTRUCTIONS = {"single", "double"}
+GLYPH_DEFINITIONS = [
+    {"id": "latin-H", "name": "H", "recipe": "cap-h", "script": "Latn", "unicode": 72},
+    {"id": "latin-O", "name": "O", "recipe": "cap-o", "script": "Latn", "unicode": 79},
+    {"id": "latin-a", "name": "a", "recipe": "latin-a", "script": "Latn", "unicode": 97},
+    {"id": "latin-zero", "name": "zero", "recipe": "zero", "script": "Latn", "unicode": 48},
+    {"id": "cyrillic-en", "name": "uni041D", "recipe": "cap-h", "script": "Cyrl", "unicode": 1053},
+    {"id": "cyrillic-o", "name": "uni041E", "recipe": "cap-o", "script": "Cyrl", "unicode": 1054},
+    {"id": "cyrillic-a", "name": "uni0430", "recipe": "cyrillic-a", "script": "Cyrl", "unicode": 1072},
+    {"id": "cyrillic-small-o", "name": "uni043E", "recipe": "small-o", "script": "Cyrl", "unicode": 1086},
+]
 
 
 class ProjectValidationError(ValueError):
@@ -27,8 +43,14 @@ class ProjectValidationError(ValueError):
 
 
 def load_project(path: Path | None = None) -> dict[str, Any]:
-    with (path or PROJECT_PATH).open(encoding="utf-8") as source:
-        project = json.load(source)
+    with (path or PROJECT_PATH).open("rb") as source:
+        raw = source.read(MAX_SOURCE_BYTES + 1)
+    if len(raw) > MAX_SOURCE_BYTES:
+        raise ProjectValidationError(f"project exceeds {MAX_SOURCE_BYTES} bytes")
+    try:
+        project = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ProjectValidationError(f"malformed UTF-8 JSON: {error}") from error
     validate_project(project)
     return project
 
@@ -47,12 +69,12 @@ def validate_project(project: Any) -> None:
         raise ProjectValidationError("project must be an object")
     required = {"schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "glyphs"}
     _only_keys(project, required, "project")
-    if project.get("schemaVersion") != 1:
+    if type(project.get("schemaVersion")) is not int or project["schemaVersion"] != 1:
         raise ProjectValidationError("unsupported schemaVersion")
-    if not isinstance(project["id"], str) or not project["id"]:
-        raise ProjectValidationError("project id must be a non-empty string")
-    if not isinstance(project["name"], str) or not project["name"]:
-        raise ProjectValidationError("project name must be a non-empty string")
+    if not isinstance(project["id"], str) or re.fullmatch(r"[a-z0-9-]{1,80}", project["id"]) is None:
+        raise ProjectValidationError("project id must be 1..80 lowercase letters, digits or hyphens")
+    if not isinstance(project["name"], str) or not 1 <= len(project["name"]) <= 100:
+        raise ProjectValidationError("project name must be 1..100 characters")
     engine = project["engine"]
     if engine != {"id": "technical-sans", "version": "1.0"}:
         raise ProjectValidationError("unsupported engine")
@@ -65,23 +87,11 @@ def validate_project(project: Any) -> None:
     _range(overrides["O"]["counter"], COUNTER_RANGE, "localOverrides.O.counter")
     switches = project["switches"]
     _only_keys(switches, {"aConstruction"}, "switches")
-    if switches["aConstruction"] not in VALID_A_CONSTRUCTIONS:
+    if not isinstance(switches["aConstruction"], str) or switches["aConstruction"] not in VALID_A_CONSTRUCTIONS:
         raise ProjectValidationError("aConstruction must be single or double")
     glyphs = project["glyphs"]
-    if not isinstance(glyphs, list) or len(glyphs) != 8:
-        raise ProjectValidationError("Phase 1a requires exactly eight glyphs")
-    expected = {"H", "O", "a", "zero", "uni041D", "uni041E", "uni0430", "uni043E"}
-    names, unicodes = set(), set()
-    for glyph in glyphs:
-        _only_keys(glyph, {"id", "name", "unicode", "script", "recipe"}, "glyph")
-        if glyph["name"] in names or glyph["unicode"] in unicodes:
-            raise ProjectValidationError("glyph names and Unicode values must be unique")
-        if glyph["script"] not in {"Latn", "Cyrl"}:
-            raise ProjectValidationError("unsupported script")
-        names.add(glyph["name"])
-        unicodes.add(glyph["unicode"])
-    if names != expected:
-        raise ProjectValidationError("glyph repertoire differs from Phase 1a")
+    if glyphs != GLYPH_DEFINITIONS:
+        raise ProjectValidationError("glyph IDs, names, Unicode, scripts and recipes must match the Phase 1a repertoire")
 
 
 def _only_keys(value: Any, expected: set[str], label: str) -> None:
@@ -90,7 +100,7 @@ def _only_keys(value: Any, expected: set[str], label: str) -> None:
 
 
 def _range(value: Any, limits: tuple[float, float], label: str) -> None:
-    if not isinstance(value, (int, float)) or isinstance(value, bool) or not limits[0] <= value <= limits[1]:
+    if not isinstance(value, (int, float)) or isinstance(value, bool) or not limits[0] <= value <= limits[1] or not math.isfinite(value):
         raise ProjectValidationError(f"{label} must be within {limits[0]}..{limits[1]}")
 
 
@@ -204,6 +214,67 @@ def validate_glyph(glyph: dict[str, Any]) -> None:
         endpoints = [(command[-2], command[-1]) for command in contour if command[0] in {"M", "L", "C"}]
         if len(set(endpoints)) < 3:
             raise ProjectValidationError(f"{glyph['name']}: contour has too few points")
+        pen = AreaPen()
+        segments = []
+        start = endpoints[0]
+        previous = start
+        pen.moveTo(start)
+        for command in contour[1:]:
+            operation = command[0]
+            if operation == "L" and len(command) == 3:
+                end = (command[1], command[2])
+                pen.lineTo(end)
+                segments.append((previous, end))
+                previous = end
+            elif operation == "C" and len(command) == 7:
+                controls = ((command[1], command[2]), (command[3], command[4]))
+                end = (command[5], command[6])
+                pen.curveTo(*controls, end)
+                segments.append((previous, *controls, end))
+                previous = end
+            elif operation == "Z" and command == ("Z",):
+                pen.closePath()
+                if previous != start:
+                    segments.append((previous, start))
+            else:
+                raise ProjectValidationError(f"{glyph['name']}: invalid contour command")
+        if not math.isfinite(pen.value) or abs(pen.value) < 1e-6:
+            raise ProjectValidationError(f"{glyph['name']}: contour has zero area")
+        for index, segment in enumerate(segments):
+            if segment[0] == segment[-1] and len(segment) == 2:
+                raise ProjectValidationError(f"{glyph['name']}: zero-length segment")
+            if len(segment) == 4:
+                halves = splitCubicAtT(*segment, 0.5)
+                # fontTools may report the shared midpoint with ~1e-4 parameter drift.
+                if any(hit.t1 < 1 - 1e-3 and hit.t2 > 1e-3 for hit in curveCurveIntersections(*halves)):
+                    raise ProjectValidationError(f"{glyph['name']}: self-intersecting cubic")
+            for other_index in range(index + 2, len(segments)):
+                if index == 0 and other_index == len(segments) - 1:
+                    continue  # The first and closing segments meet at the start point.
+                if _segments_intersect(segment, segments[other_index]):
+                    raise ProjectValidationError(f"{glyph['name']}: self-intersecting contour")
+
+
+def _segments_intersect(first: tuple, second: tuple) -> bool:
+    if len(first) == 4 and len(second) == 4:
+        return bool(curveCurveIntersections(first, second))
+    if len(first) == 4:
+        return bool(curveLineIntersections(first, second))
+    if len(second) == 4:
+        return bool(curveLineIntersections(second, first))
+    a, b = first
+    c, d = second
+
+    def cross(p: tuple, q: tuple, r: tuple) -> float:
+        return (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])
+
+    def on_segment(p: tuple, q: tuple, r: tuple) -> bool:
+        return min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and min(p[1], r[1]) <= q[1] <= max(p[1], r[1])
+
+    turns = (cross(a, b, c), cross(a, b, d), cross(c, d, a), cross(c, d, b))
+    if turns[0] * turns[1] < 0 and turns[2] * turns[3] < 0:
+        return True
+    return any(abs(turn) < 1e-8 and on_segment(*points) for turn, points in zip(turns, ((a, c, b), (a, d, b), (c, a, d), (c, b, d))))
 
 
 def glyph_signature(glyph: dict[str, Any]) -> dict[str, Any]:

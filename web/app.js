@@ -1,15 +1,6 @@
 const KAPPA = 0.5522847498307936;
-const glyphs = [
-  { id: 'latin-H', name: 'H', char: 'H', recipe: 'cap-h' },
-  { id: 'latin-O', name: 'O', char: 'O', recipe: 'cap-o' },
-  { id: 'latin-a', name: 'a', char: 'a', recipe: 'latin-a' },
-  { id: 'latin-zero', name: 'zero', char: '0', recipe: 'zero' },
-  { id: 'cyrillic-en', name: 'uni041D', char: 'Н', recipe: 'cap-h' },
-  { id: 'cyrillic-o', name: 'uni041E', char: 'О', recipe: 'cap-o' },
-  { id: 'cyrillic-a', name: 'uni0430', char: 'а', recipe: 'cyrillic-a' },
-  { id: 'cyrillic-small-o', name: 'uni043E', char: 'о', recipe: 'small-o' },
-];
-
+let project;
+let glyphs = [];
 const controls = { weight: 88, counter: 1, construction: 'double' };
 let selected = 'H';
 const svg = (tag, attributes = {}) => {
@@ -67,9 +58,9 @@ function signature(state = controls) {
 }
 
 function glyphSvg(result, className = 'glyph') {
-  const svgElement = svg('svg', { class: className, viewBox: `0 0 ${result.advance} 800`, 'aria-hidden': 'true' });
+  const svgElement = svg('svg', { class: className, viewBox: `0 0 ${result.advance} 800`, 'aria-hidden': 'true', 'data-glyph-id': result.id });
   const group = svg('g', { transform: 'translate(0 720) scale(1 -1)' });
-  for (const contour of result.contours) group.append(svg('path', { d: path(contour), 'fill-rule': 'evenodd' }));
+  group.append(svg('path', { d: result.contours.map(path).join(' '), 'fill-rule': 'nonzero' }));
   svgElement.append(group);
   return svgElement;
 }
@@ -77,8 +68,11 @@ function glyphSvg(result, className = 'glyph') {
 function render() {
   try {
     const selectedGlyph = evaluateGlyph(glyphs.find(glyph => glyph.name === selected));
-    document.querySelector('#weight-value').textContent = controls.weight;
-    document.querySelector('#counter-value').textContent = Number(controls.counter).toFixed(2);
+    document.querySelector('#weight').value = controls.weight;
+    document.querySelector('#weight-number').value = controls.weight;
+    document.querySelector('#counter').value = controls.counter;
+    document.querySelector('#counter-number').value = controls.counter;
+    document.querySelector('#construction').value = controls.construction;
     document.querySelector('#selected-name').textContent = selectedGlyph.char;
     const outline = document.querySelector('#outline'); outline.replaceChildren(glyphSvg(selectedGlyph, 'outline-glyph').querySelector('g'));
     const chart = document.querySelector('#chart'); chart.replaceChildren();
@@ -88,18 +82,67 @@ function render() {
       button.addEventListener('click', () => { selected = glyph.name; render(); }); chart.append(button);
     }
     const specimen = document.querySelector('#specimen-preview'); specimen.replaceChildren();
+    const unsupported = new Set();
     for (const character of document.querySelector('#specimen').value) {
       const glyph = glyphs.find(item => item.char === character);
       if (glyph) specimen.append(glyphSvg(evaluateGlyph(glyph)));
       else if (/\s/.test(character)) { const space = document.createElement('span'); space.className = 'glyph space'; specimen.append(space); }
+      else unsupported.add(character);
     }
-    document.querySelector('#preview-error').textContent = '';
+    document.querySelector('#preview-error').textContent = unsupported.size ? `Outside the Phase 1a repertoire: ${[...unsupported].join(' ')}` : '';
+    document.querySelector('#download-project').disabled = false;
   } catch (error) { document.querySelector('#preview-error').textContent = error.message; }
 }
 
-for (const input of ['weight', 'counter', 'construction']) {
-  document.querySelector(`#${input}`).addEventListener('input', event => { controls[input] = event.target.value; render(); });
+for (const key of ['weight', 'counter']) {
+  document.querySelector(`#${key}`).addEventListener('input', event => { controls[key] = Number(event.target.value); render(); });
+  const numberInput = document.querySelector(`#${key}-number`);
+  numberInput.addEventListener('input', () => {
+    if (numberInput.validity.valid && numberInput.value !== '' && Number.isFinite(numberInput.valueAsNumber)) {
+      controls[key] = numberInput.valueAsNumber;
+      render();
+    } else {
+      document.querySelector('#preview-error').textContent = `${key} is outside the allowed range`;
+      document.querySelector('#download-project').disabled = true;
+    }
+  });
+  numberInput.addEventListener('blur', () => { if (!numberInput.validity.valid) render(); });
 }
+document.querySelector('#construction').addEventListener('input', event => { controls.construction = event.target.value; render(); });
 document.querySelector('#specimen').addEventListener('input', render);
-window.pfl = { evaluateGlyph, glyphs, signature, get controls() { return { ...controls }; } };
-render();
+
+function currentProject() {
+  return {
+    ...project,
+    axes: { ...project.axes, weight: controls.weight },
+    localOverrides: { ...project.localOverrides, O: { ...project.localOverrides.O, counter: controls.counter } },
+    switches: { ...project.switches, aConstruction: controls.construction },
+  };
+}
+
+document.querySelector('#download-project').addEventListener('click', () => {
+  const content = JSON.stringify(currentProject(), null, 2) + '\n';
+  const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pfl-phase-1a-project.json';
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+});
+
+async function initialize() {
+  const response = await fetch(new URL('../fontlab/project.json', import.meta.url));
+  if (!response.ok) throw new Error(`Cannot load project JSON (${response.status})`);
+  project = await response.json();
+  if (project.schemaVersion !== 1 || !Array.isArray(project.glyphs) || project.glyphs.length !== 8) {
+    throw new Error('Unsupported Phase 1a project source');
+  }
+  glyphs = project.glyphs.map(glyph => ({ ...glyph, char: String.fromCodePoint(glyph.unicode) }));
+  controls.weight = project.axes.weight;
+  controls.counter = project.localOverrides.O.counter;
+  controls.construction = project.switches.aConstruction;
+  window.pfl = { evaluateGlyph, glyphs, signature, currentProject, get controls() { return { ...controls }; } };
+  render();
+}
+
+initialize().catch(error => { document.querySelector('#preview-error').textContent = error.message; });

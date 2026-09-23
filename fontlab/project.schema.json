@@ -7,8 +7,8 @@
   "required": ["schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "glyphs"],
   "properties": {
     "schemaVersion": {"const": 1},
-    "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
-    "name": {"type": "string", "minLength": 1},
+    "id": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[a-z0-9-]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 100},
     "engine": {
       "type": "object",
       "additionalProperties": false,
@@ -40,21 +40,15 @@
       "required": ["aConstruction"],
       "properties": {"aConstruction": {"enum": ["single", "double"]}}
     },
-    "glyphs": {
-      "type": "array",
-      "minItems": 8,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["id", "name", "unicode", "script", "recipe"],
-        "properties": {
-          "id": {"type": "string"},
-          "name": {"type": "string"},
-          "unicode": {"type": "integer", "minimum": 0, "maximum": 1114111},
-          "script": {"enum": ["Latn", "Cyrl"]},
-          "recipe": {"type": "string"}
-        }
-      }
-    }
+    "glyphs": {"const": [
+      {"id": "latin-H", "name": "H", "recipe": "cap-h", "script": "Latn", "unicode": 72},
+      {"id": "latin-O", "name": "O", "recipe": "cap-o", "script": "Latn", "unicode": 79},
+      {"id": "latin-a", "name": "a", "recipe": "latin-a", "script": "Latn", "unicode": 97},
+      {"id": "latin-zero", "name": "zero", "recipe": "zero", "script": "Latn", "unicode": 48},
+      {"id": "cyrillic-en", "name": "uni041D", "recipe": "cap-h", "script": "Cyrl", "unicode": 1053},
+      {"id": "cyrillic-o", "name": "uni041E", "recipe": "cap-o", "script": "Cyrl", "unicode": 1054},
+      {"id": "cyrillic-a", "name": "uni0430", "recipe": "cyrillic-a", "script": "Cyrl", "unicode": 1072},
+      {"id": "cyrillic-small-o", "name": "uni043E", "recipe": "small-o", "script": "Cyrl", "unicode": 1086}
+    ]}
   }
 }

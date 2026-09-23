@@ -5,8 +5,8 @@
 Status: RUNNABLE / GREEN
 
 Current phase: Phase 1 — Geometric/Technical Sans MVP.
-Just completed: Phase 1a source/preview/export vertical slice; evidence is in `.progressive/phases/01-technical-sans-mvp.md`.
-Verification: deterministic recipe, Chrome browser preview/parity and static UFO → Designspace → TTF/OTF/WOFF2 checks passed.
+Just completed: Phase 1a review closure for source/preview/export vertical slice; evidence is in `.progressive/phases/01-technical-sans-mvp.md`.
+Verification: 11 Python tests, Chrome SVG/controls/project round-trip and static UFO → Designspace → TTF/OTF/WOFF2 binary checks passed. Default export, syntax and dependency checks passed.
 Blockers: none for Phase 1b. Full-font type quality and variable compatibility remain later gates.
 
 ## Next action

@@ -49,3 +49,19 @@ checks for all eight Unicode mappings with fontTools 4.66.0.
 
 Phase 1 remains active: full basic Latin/Russian Cyrillic repertoire, script proofing,
 metrics/kerning, presets and later quality review belong to Phase 1b.
+
+## Phase 1a Review Closure — 2026-09-24
+
+The follow-up review fixed the SVG counter fill: each glyph now uses one nonzero-winding path,
+matching the exported contours. Browser controls load the canonical project JSON; numeric and
+slider inputs remain in sync, and the page downloads a versioned project with the chosen values.
+The Python compiler accepts that file with `--project`, names each static instance by its source
+hash, and writes only its own instance directory without clearing unrelated `build/` contents.
+
+The JSON Schema and runtime validator now enforce the exact eight-glyph ID/Unicode/script/recipe
+contract. Input size is capped at 64 KiB, compiler subprocesses time out, and generated contours
+are checked for zero area and self-intersection before compilation. `npm test` passed 11 Python
+tests and the Chrome round-trip test, including customized project → UFO/Designspace →
+TTF/OTF/WOFF2, binary outlines/cmap, Cyrillic glyph IDs and a 375 px viewport. `npm run export`,
+syntax checks, dependency checks and `git diff --check` passed. Type quality and the full
+Latin/Cyrillic repertoire remain Phase 1b work.

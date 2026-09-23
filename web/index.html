@@ -11,21 +11,29 @@
       <header>
         <p class="eyebrow">PFL / PHASE 1A</p>
         <h1>Technical Sans</h1>
-        <p class="summary">Original Latin + Cyrillic recipe preview. The export compiler is authoritative.</p>
+        <p class="summary">Tune eight original Latin and Cyrillic glyphs, then download the project for static font export.</p>
       </header>
       <section class="workbench" aria-label="Parametric font controls and preview">
         <form class="controls" id="controls">
           <h2>Construction</h2>
-          <label for="weight">Shared weight <output id="weight-value">88</output></label>
-          <input id="weight" type="range" min="40" max="160" value="88" step="1">
-          <label for="counter">Latin O counter <output id="counter-value">1.00</output></label>
-          <input id="counter" type="range" min="0.5" max="1.5" value="1" step="0.05">
+          <label for="weight-number">Shared weight</label>
+          <div class="axis-inputs">
+            <input id="weight" type="range" min="40" max="160" value="88" step="any" aria-label="Shared weight slider">
+            <input id="weight-number" type="number" min="40" max="160" value="88" step="any" required aria-label="Shared weight value">
+          </div>
+          <label for="counter-number">Latin O counter</label>
+          <div class="axis-inputs">
+            <input id="counter" type="range" min="0.5" max="1.5" value="1" step="any" aria-label="Latin O counter slider">
+            <input id="counter-number" type="number" min="0.5" max="1.5" value="1" step="any" required aria-label="Latin O counter value">
+          </div>
           <label for="construction">Latin a construction</label>
           <select id="construction">
             <option value="double" selected>Double-storey</option>
             <option value="single">Single-storey</option>
           </select>
           <p class="scope">O counter is local to Latin O. The a switch is discrete and does not alter Cyrillic а.</p>
+          <button id="download-project" type="button" disabled>Download project JSON</button>
+          <p class="scope">Build the downloaded settings with <code>npm run export -- --project path/to/project.json</code>.</p>
         </form>
         <section class="preview-panel" aria-label="Outline and specimen preview">
           <div class="outline-head"><h2>Outline preview</h2><span id="selected-name">H</span></div>

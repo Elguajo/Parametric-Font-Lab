@@ -12,13 +12,17 @@ h2 { font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; }
 .controls, .chart-panel { border-right: 1px solid #3a3c39; }
 .controls label, .specimen-label { display: flex; justify-content: space-between; gap: 8px; font-size: .86rem; margin: 22px 0 8px; }
 input, select, textarea { width: 100%; accent-color: #d6ff00; }
-select, textarea { border: 1px solid #5c5e58; border-radius: 2px; background: #0d0e0e; color: inherit; padding: 9px; font: inherit; }
+.axis-inputs { display: grid; grid-template-columns: minmax(0, 1fr) 68px; align-items: center; gap: 10px; }
+select, textarea, input[type="number"] { border: 1px solid #5c5e58; border-radius: 2px; background: #0d0e0e; color: inherit; padding: 9px; font: inherit; }
+input[type="number"] { font-variant-numeric: tabular-nums; padding: 7px 3px; text-align: center; }
+button#download-project { width: 100%; margin-top: 4px; border: 1px solid #d6ff00; background: #d6ff00; color: #111213; font: inherit; font-size: .82rem; font-weight: 700; padding: 10px; cursor: pointer; }
+button#download-project:disabled { opacity: .45; cursor: default; }
 .scope { font-size: .78rem; margin-top: 22px; }
 .preview-panel { background: #101111; }
 .outline-head { display: flex; justify-content: space-between; align-items: center; }
 #selected-name { color: #d6ff00; font-size: 1.8rem; font-weight: 700; }
 #outline { display: block; width: min(100%, 360px); height: 330px; margin: 6px auto 18px; background: #f3f0e9; }
-#outline path, .glyph path { fill: #111213; fill-rule: evenodd; }
+#outline path, .glyph path { fill: #111213; fill-rule: nonzero; }
 .specimen-preview { display: flex; flex-wrap: wrap; min-height: 76px; margin-top: 14px; padding: 8px; background: #f3f0e9; color: #111213; }
 .glyph { width: 46px; height: 58px; } .glyph.space { width: 14px; }
 .chart { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
