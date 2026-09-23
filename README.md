@@ -442,10 +442,12 @@ Parametric Font Lab может изучать существующие гарн�
 
 # Repository
 
-## Phase 1a: run locally
+## Phase 1b: run locally
 
-The implemented vertical slice is deliberately small: original recipes for `H/O/a/0` and
-`Н/О/а/о`, a browser SVG preview, and static font export. From a clean macOS/Linux checkout:
+The implemented workbench generates original Basic Latin, Russian Cyrillic including `Ё/ё`,
+NBSP and acute/dieresis marks from bounded recipes. It provides a browser SVG preview,
+script-aware metrics/kerning, controlled Text/Display presets and static export. From a
+clean macOS/Linux checkout:
 
 ```sh
 npm run setup
@@ -458,15 +460,16 @@ Open `http://127.0.0.1:8765/web/` for the browser workbench. Adjust the sliders 
 fields, download the resulting project JSON, then compile exactly those settings with:
 
 ```sh
-npm run export -- --project /path/to/pfl-phase-1a-project.json
+npm run export -- --project /path/to/pfl-phase-1b-project.json
 ```
 
 `requirements.lock` and `package-lock.json` pin the compiler and test dependency graphs.
 Each export writes derived UFO, Designspace, TTF, OTF, WOFF2 and a manifest under
 `build/<source-hash>/`. Exports leave unrelated files in `build/` untouched.
 
-The contours in `fontlab/project.json` are original project source; no external font outlines
-are imported. See `THIRD_PARTY_NOTICES.md` for compiler/test dependencies.
+`fontlab/project.json` selects only the bounded Phase 1b repertoire and controls; the original
+contours are deterministically generated locally by `fontlab/recipes.py`. No external font
+outlines are imported. See `THIRD_PARTY_NOTICES.md` for compiler/test dependencies.
 
 https://github.com/Elguajo/Parametric-Font-Lab
 

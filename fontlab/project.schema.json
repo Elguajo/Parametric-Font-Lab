@@ -1,54 +1,31 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://parametric-font-lab.local/schema/project-1.json",
-  "title": "Parametric Font Lab project",
+  "title": "Parametric Font Lab Phase 1b project",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "glyphs"],
+  "required": ["schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "metrics", "kerning", "activePreset", "glyphs"],
   "properties": {
     "schemaVersion": {"const": 1},
     "id": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[a-z0-9-]+$"},
     "name": {"type": "string", "minLength": 1, "maxLength": 100},
-    "engine": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "version"],
-      "properties": {"id": {"const": "technical-sans"}, "version": {"const": "1.0"}}
-    },
+    "engine": {"type": "object", "additionalProperties": false, "required": ["id", "version"], "properties": {"id": {"const": "technical-sans"}, "version": {"const": "1.0"}}},
     "axes": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["weight"],
-      "properties": {"weight": {"type": "number", "minimum": 40, "maximum": 160}}
-    },
-    "localOverrides": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["O"],
+      "type": "object", "additionalProperties": false,
+      "required": ["weight", "width", "xHeight", "roundness", "aperture"],
       "properties": {
-        "O": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["counter"],
-          "properties": {"counter": {"type": "number", "minimum": 0.5, "maximum": 1.5}}
-        }
+        "weight": {"type": "number", "minimum": 40, "maximum": 160},
+        "width": {"type": "number", "minimum": 0.85, "maximum": 1.15},
+        "xHeight": {"type": "number", "minimum": 460, "maximum": 540},
+        "roundness": {"type": "number", "minimum": 0, "maximum": 1},
+        "aperture": {"type": "number", "minimum": 0, "maximum": 1}
       }
     },
-    "switches": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["aConstruction"],
-      "properties": {"aConstruction": {"enum": ["single", "double"]}}
-    },
-    "glyphs": {"const": [
-      {"id": "latin-H", "name": "H", "recipe": "cap-h", "script": "Latn", "unicode": 72},
-      {"id": "latin-O", "name": "O", "recipe": "cap-o", "script": "Latn", "unicode": 79},
-      {"id": "latin-a", "name": "a", "recipe": "latin-a", "script": "Latn", "unicode": 97},
-      {"id": "latin-zero", "name": "zero", "recipe": "zero", "script": "Latn", "unicode": 48},
-      {"id": "cyrillic-en", "name": "uni041D", "recipe": "cap-h", "script": "Cyrl", "unicode": 1053},
-      {"id": "cyrillic-o", "name": "uni041E", "recipe": "cap-o", "script": "Cyrl", "unicode": 1054},
-      {"id": "cyrillic-a", "name": "uni0430", "recipe": "cyrillic-a", "script": "Cyrl", "unicode": 1072},
-      {"id": "cyrillic-small-o", "name": "uni043E", "recipe": "small-o", "script": "Cyrl", "unicode": 1086}
-    ]}
+    "localOverrides": {"type": "object", "additionalProperties": false, "required": ["O"], "properties": {"O": {"type": "object", "additionalProperties": false, "required": ["counter"], "properties": {"counter": {"type": "number", "minimum": 0.5, "maximum": 1.5}}}}},
+    "switches": {"type": "object", "additionalProperties": false, "required": ["aConstruction", "zeroStyle"], "properties": {"aConstruction": {"enum": ["single", "double"]}, "zeroStyle": {"enum": ["plain", "slashed"]}}},
+    "metrics": {"const": {"profile": "technical-proportional-v1"}},
+    "kerning": {"const": {"profile": "script-aware-v1"}},
+    "activePreset": {"enum": ["text", "display", "custom"]},
+    "glyphs": {"const": {"repertoire": "basic-latin-russian-v1"}}
   }
 }

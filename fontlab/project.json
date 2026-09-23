@@ -1,19 +1,13 @@
 {
-  "axes": {"weight": 88},
+  "activePreset": "text",
+  "axes": {"aperture": 0.58, "roundness": 0.74, "weight": 88, "width": 1.0, "xHeight": 500},
   "engine": {"id": "technical-sans", "version": "1.0"},
-  "glyphs": [
-    {"id": "latin-H", "name": "H", "recipe": "cap-h", "script": "Latn", "unicode": 72},
-    {"id": "latin-O", "name": "O", "recipe": "cap-o", "script": "Latn", "unicode": 79},
-    {"id": "latin-a", "name": "a", "recipe": "latin-a", "script": "Latn", "unicode": 97},
-    {"id": "latin-zero", "name": "zero", "recipe": "zero", "script": "Latn", "unicode": 48},
-    {"id": "cyrillic-en", "name": "uni041D", "recipe": "cap-h", "script": "Cyrl", "unicode": 1053},
-    {"id": "cyrillic-o", "name": "uni041E", "recipe": "cap-o", "script": "Cyrl", "unicode": 1054},
-    {"id": "cyrillic-a", "name": "uni0430", "recipe": "cyrillic-a", "script": "Cyrl", "unicode": 1072},
-    {"id": "cyrillic-small-o", "name": "uni043E", "recipe": "small-o", "script": "Cyrl", "unicode": 1086}
-  ],
-  "id": "pfl-technical-sans-phase-1a",
+  "glyphs": {"repertoire": "basic-latin-russian-v1"},
+  "id": "pfl-technical-sans-phase-1b",
+  "kerning": {"profile": "script-aware-v1"},
   "localOverrides": {"O": {"counter": 1.0}},
-  "name": "PFL Technical Sans Phase 1a",
+  "metrics": {"profile": "technical-proportional-v1"},
+  "name": "PFL Technical Sans Phase 1b",
   "schemaVersion": 1,
-  "switches": {"aConstruction": "double"}
+  "switches": {"aConstruction": "double", "zeroStyle": "plain"}
 }

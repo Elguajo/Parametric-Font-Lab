@@ -1,148 +1,19 @@
-const KAPPA = 0.5522847498307936;
-let project;
-let glyphs = [];
-const controls = { weight: 88, counter: 1, construction: 'double' };
-let selected = 'H';
-const svg = (tag, attributes = {}) => {
-  const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
-  for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
-  return element;
-};
-const fmt = value => Number(value.toFixed(4)).toString();
-const path = contour => contour.map(command => command[0] === 'Z' ? 'Z' : `${command[0]} ${command.slice(1).map(fmt).join(' ')}`).join(' ');
-const rectangle = (x0, y0, x1, y1, reverse = false) => {
-  const points = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
-  if (reverse) points.reverse();
-  return [['M', ...points[0]], ...points.slice(1).map(point => ['L', ...point]), ['Z']];
-};
-const oval = (cx, cy, rx, ry, reverse = false) => {
-  const k = KAPPA;
-  if (!reverse) return [
-    ['M', cx + rx, cy],
-    ['C', cx + rx, cy + k * ry, cx + k * rx, cy + ry, cx, cy + ry],
-    ['C', cx - k * rx, cy + ry, cx - rx, cy + k * ry, cx - rx, cy],
-    ['C', cx - rx, cy - k * ry, cx - k * rx, cy - ry, cx, cy - ry],
-    ['C', cx + k * rx, cy - ry, cx + rx, cy - k * ry, cx + rx, cy], ['Z'],
-  ];
-  return [
-    ['M', cx + rx, cy],
-    ['C', cx + rx, cy - k * ry, cx + k * rx, cy - ry, cx, cy - ry],
-    ['C', cx - k * rx, cy - ry, cx - rx, cy - k * ry, cx - rx, cy],
-    ['C', cx - rx, cy + k * ry, cx - k * rx, cy + ry, cx, cy + ry],
-    ['C', cx + k * rx, cy + ry, cx + rx, cy + k * ry, cx + rx, cy], ['Z'],
-  ];
-};
-const ring = (cx, cy, rx, ry, inset) => [oval(cx, cy, rx, ry), oval(cx, cy, rx - inset, ry - inset, true)];
-const singleA = weight => [...ring(255, 245, 185, 245, weight), rectangle(440 - weight, 0, 440, 510), rectangle(310, 0, 440, weight)];
-const doubleA = weight => [...ring(250, 185, 175, 185, weight), ...ring(250, 405, 185, 185, weight), rectangle(425 - weight, 0, 425, 520), rectangle(265, 288, 425 - weight / 2, 288 + weight)];
-const cyrillicA = weight => [...ring(260, 190, 180, 190, weight), ...ring(260, 400, 180, 180, weight), rectangle(430 - weight, 0, 430, 510), rectangle(270, 285, 430 - weight / 2, 285 + weight)];
-
-function evaluateGlyph(glyph, state = controls) {
-  const weight = Number(state.weight);
-  let contours; let advance;
-  if (glyph.recipe === 'cap-h') { contours = [rectangle(70, 0, 70 + weight, 700), rectangle(610 - weight, 0, 610, 700), rectangle(70 + weight, 318 - weight / 2, 610 - weight, 318 + weight / 2)]; advance = 680; }
-  if (glyph.recipe === 'cap-o') { const inset = weight + 24 * (1 - (glyph.name === 'O' ? Number(state.counter) : 1)); contours = ring(340, 350, 270, 360, inset); advance = 680; }
-  if (glyph.recipe === 'zero') { contours = ring(340, 350, 235, 350, weight + 8); advance = 680; }
-  if (glyph.recipe === 'small-o') { contours = ring(270, 250, 205, 250, weight); advance = 540; }
-  if (glyph.recipe === 'latin-a') { contours = state.construction === 'single' ? singleA(weight) : doubleA(weight); advance = 540; }
-  if (glyph.recipe === 'cyrillic-a') { contours = cyrillicA(weight); advance = 540; }
-  return { ...glyph, advance, contours };
-}
-
-function signature(state = controls) {
-  return glyphs.map(glyph => {
-    const result = evaluateGlyph(glyph, state);
-    const points = result.contours.flat().filter(command => ['M', 'L', 'C'].includes(command[0])).map(command => command.slice(-2));
-    return { name: result.name, advance: result.advance, contours: result.contours.length, bounds: [Math.min(...points.map(point => point[0])), Math.min(...points.map(point => point[1])), Math.max(...points.map(point => point[0])), Math.max(...points.map(point => point[1]))].map(value => Number(value.toFixed(4))), outline: result.contours.map(path).join('|') };
-  });
-}
-
-function glyphSvg(result, className = 'glyph') {
-  const svgElement = svg('svg', { class: className, viewBox: `0 0 ${result.advance} 800`, 'aria-hidden': 'true', 'data-glyph-id': result.id });
-  const group = svg('g', { transform: 'translate(0 720) scale(1 -1)' });
-  group.append(svg('path', { d: result.contours.map(path).join(' '), 'fill-rule': 'nonzero' }));
-  svgElement.append(group);
-  return svgElement;
-}
-
-function render() {
-  try {
-    const selectedGlyph = evaluateGlyph(glyphs.find(glyph => glyph.name === selected));
-    document.querySelector('#weight').value = controls.weight;
-    document.querySelector('#weight-number').value = controls.weight;
-    document.querySelector('#counter').value = controls.counter;
-    document.querySelector('#counter-number').value = controls.counter;
-    document.querySelector('#construction').value = controls.construction;
-    document.querySelector('#selected-name').textContent = selectedGlyph.char;
-    const outline = document.querySelector('#outline'); outline.replaceChildren(glyphSvg(selectedGlyph, 'outline-glyph').querySelector('g'));
-    const chart = document.querySelector('#chart'); chart.replaceChildren();
-    for (const glyph of glyphs) {
-      const button = document.createElement('button'); button.type = 'button'; button.className = 'glyph-button'; button.dataset.glyph = glyph.name; button.setAttribute('aria-pressed', String(glyph.name === selected)); button.setAttribute('aria-label', `Select ${glyph.char}`);
-      button.append(glyphSvg(evaluateGlyph(glyph))); const label = document.createElement('span'); label.textContent = glyph.char; button.append(label);
-      button.addEventListener('click', () => { selected = glyph.name; render(); }); chart.append(button);
-    }
-    const specimen = document.querySelector('#specimen-preview'); specimen.replaceChildren();
-    const unsupported = new Set();
-    for (const character of document.querySelector('#specimen').value) {
-      const glyph = glyphs.find(item => item.char === character);
-      if (glyph) specimen.append(glyphSvg(evaluateGlyph(glyph)));
-      else if (/\s/.test(character)) { const space = document.createElement('span'); space.className = 'glyph space'; specimen.append(space); }
-      else unsupported.add(character);
-    }
-    document.querySelector('#preview-error').textContent = unsupported.size ? `Outside the Phase 1a repertoire: ${[...unsupported].join(' ')}` : '';
-    document.querySelector('#download-project').disabled = false;
-  } catch (error) { document.querySelector('#preview-error').textContent = error.message; }
-}
-
-for (const key of ['weight', 'counter']) {
-  document.querySelector(`#${key}`).addEventListener('input', event => { controls[key] = Number(event.target.value); render(); });
-  const numberInput = document.querySelector(`#${key}-number`);
-  numberInput.addEventListener('input', () => {
-    if (numberInput.validity.valid && numberInput.value !== '' && Number.isFinite(numberInput.valueAsNumber)) {
-      controls[key] = numberInput.valueAsNumber;
-      render();
-    } else {
-      document.querySelector('#preview-error').textContent = `${key} is outside the allowed range`;
-      document.querySelector('#download-project').disabled = true;
-    }
-  });
-  numberInput.addEventListener('blur', () => { if (!numberInput.validity.valid) render(); });
-}
-document.querySelector('#construction').addEventListener('input', event => { controls.construction = event.target.value; render(); });
-document.querySelector('#specimen').addEventListener('input', render);
-
-function currentProject() {
-  return {
-    ...project,
-    axes: { ...project.axes, weight: controls.weight },
-    localOverrides: { ...project.localOverrides, O: { ...project.localOverrides.O, counter: controls.counter } },
-    switches: { ...project.switches, aConstruction: controls.construction },
-  };
-}
-
-document.querySelector('#download-project').addEventListener('click', () => {
-  const content = JSON.stringify(currentProject(), null, 2) + '\n';
-  const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'pfl-phase-1a-project.json';
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
-});
-
-async function initialize() {
-  const response = await fetch(new URL('../fontlab/project.json', import.meta.url));
-  if (!response.ok) throw new Error(`Cannot load project JSON (${response.status})`);
-  project = await response.json();
-  if (project.schemaVersion !== 1 || !Array.isArray(project.glyphs) || project.glyphs.length !== 8) {
-    throw new Error('Unsupported Phase 1a project source');
-  }
-  glyphs = project.glyphs.map(glyph => ({ ...glyph, char: String.fromCodePoint(glyph.unicode) }));
-  controls.weight = project.axes.weight;
-  controls.counter = project.localOverrides.O.counter;
-  controls.construction = project.switches.aConstruction;
-  window.pfl = { evaluateGlyph, glyphs, signature, currentProject, get controls() { return { ...controls }; } };
-  render();
-}
-
-initialize().catch(error => { document.querySelector('#preview-error').textContent = error.message; });
+const K=.5522847498307936, caps='ABCDEFGHIJKLMNOPQRSTUVWXYZ', lows='abcdefghijklmnopqrstuvwxyz', cu='АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', cl='абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+let project, glyphs=[], selected='A', snapshot=null;
+const state={weight:88,width:1,xHeight:500,roundness:.74,aperture:.58,counter:1,construction:'double',zeroStyle:'plain',preset:'text'};
+const S=(tag,a={})=>{const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));return e};
+const rect=(x,y,X,Y)=>[['M',x,y],['L',X,y],['L',X,Y],['L',x,Y],['Z']];
+const oval=(x,y,rx,ry,rev=false)=>{let k=.18+.3722847498307936*state.roundness;let q=[['M',x+rx,y],['C',x+rx,y+k*ry,x+k*rx,y+ry,x,y+ry],['C',x-k*rx,y+ry,x-rx,y+k*ry,x-rx,y],['C',x-rx,y-k*ry,x-k*rx,y-ry,x,y-ry],['C',x+k*rx,y-ry,x+rx,y-k*ry,x+rx,y],['Z']];return rev?[['M',x+rx,y],['C',x+rx,y-k*ry,x+k*rx,y-ry,x,y-ry],['C',x-k*rx,y-ry,x-rx,y-k*ry,x-rx,y],['C',x-rx,y+k*ry,x-k*rx,y+ry,x,y+ry],['C',x+k*rx,y+ry,x+rx,y+k*ry,x+rx,y],['Z']]:q};
+const ring=(x,y,rx,ry,w)=>[oval(x,y,rx,ry),oval(x,y,rx-w,ry-w,true)];
+const stroke=(x,y,X,Y,w)=>{let d=Math.hypot(X-x,Y-y),p=-(Y-y)/d*w/2,q=(X-x)/d*w/2;return [['M',x+p,y+q],['L',X+p,Y+q],['L',X-p,Y-q],['L',x-p,y-q],['Z']]};
+const adv=g=>g.mark?0:g.char===' '||g.char===' '?280:g.kind==='common'?360:g.kind==='digit'?620:g.upper?(g.char.match(/[MWЖШЩЮ]/)?820:g.char.match(/[IЛ]/)?420:680):(g.char.match(/[mwжшщю]/)?760:g.char.match(/[ilт]/)?330:540);
+function shape(g){let a=adv(g),w=state.weight,h=g.upper?700:state.xHeight,l=80,r=a-80,m=a/2,c=g.char;let v=x=>rect(x-w/2,0,x+w/2,h),bar=y=>rect(l,y-w/2,r,y+w/2),generic=()=>[v(l),v(r),bar(h),bar(0)];if(g.mark)return c==='́'?[stroke(180,720,340,890,w*.5)]:[...ring(180,800,w*.52,w*.52,w*.28),...ring(340,800,w*.52,w*.52,w*.28)];if(g.kind==='common'){if(c===' '||c===' ')return [];if('-_'.includes(c))return [bar(c==='-'?350:0)];if('/\\'.includes(c))return [stroke(a*.25,0,a*.75,700,w)];return [rect(m-w/2,0,m+w/2,700)]}if(g.kind==='digit'){if(c==='0')return [...ring(m,350,a*.34,350,w+8),...(state.zeroStyle==='slashed'?[stroke(a*.27,85,a*.73,615,w*.5)]:[])];return generic()}if('OoОоФфЮю'.includes(c))return [...ring(m,h/2,a*.36,h*.48,w+(c==='O'?24*(1-state.counter):0)),...('Фф'.includes(c)?[v(m)]:[])];if(c==='a'&&state.construction==='single')return [...ring(a*.46,h*.42,a*.29,h*.38,w),rect(a*.72-w,0,a*.72,h)];if('HН'.includes(c))return [v(l),v(r),bar(h/2)];if('AEFЕ'.includes(c))return [v(l),bar(h),bar(h/2),bar(0)];if('XxЖж'.includes(c))return [stroke(l,0,r,h,w),stroke(l,h,r,0,w)];if('ДЛл'.includes(c))return [bar(0),stroke(l,0,m,h,w),stroke(r,0,m,h,w)];if('УуYy'.includes(c))return [stroke(l,h,m,h*.35,w),stroke(r,h,m,h*.35,w),stroke(m,h*.35,l,-180,w)];if('Ёё'.includes(c))return [v(l),bar(h),bar(h/2),bar(0),...ring(a*.36,h+90,w*.5,w*.5,w*.28),...ring(a*.64,h+90,w*.5,w*.5,w*.28)];return generic()}
+function evalGlyph(g){let a=Math.round(adv(g)*state.width),q=shape(g).map(z=>z.map(c=>c[0]==='Z'?c:[c[0],...c.slice(1).map((v,i)=>i%2===0?v*state.width:v)]));return {...g,advance:a,contours:q}}
+const path=q=>q.map(c=>c[0]==='Z'?'Z':`${c[0]} ${c.slice(1).map(x=>Number(x.toFixed(3))).join(' ')}`).join(' ');
+function svgGlyph(g){let x=S('svg',{class:'glyph',viewBox:`0 -180 ${g.advance||280} 1100`,'data-glyph-id':g.id}),p=S('path',{d:g.contours.map(path).join(' '),'fill-rule':'nonzero'});x.append(p);return x}
+const name=(c)=>c===' '?'space':c===' '?'nbspace':/^[A-Za-z]$/.test(c)?c:/^\d$/.test(c)?['zero','one','two','three','four','five','six','seven','eight','nine'][+c]:c==='́'?'acutecomb':c==='̈'?'dieresiscomb':`uni${c.codePointAt(0).toString(16).padStart(4,'0').toUpperCase()}`;
+function render(){let current=evalGlyph(glyphs.find(x=>x.char===selected));document.querySelector('#selected-name').textContent=selected;let out=document.querySelector('#outline');out.replaceChildren(S('path',{d:current.contours.map(path).join(' '),'fill-rule':'nonzero'}));let chart=document.querySelector('#chart');chart.replaceChildren();glyphs.forEach(g=>{let b=document.createElement('button');b.type='button';b.className='glyph-button';b.dataset.glyph=g.name;b.textContent=g.char;b.onclick=()=>{selected=g.char;render()};chart.append(b)});let p=document.querySelector('#specimen-preview');p.replaceChildren();let bad=[];let prev=null;for(let c of document.querySelector('#specimen').value){let g=glyphs.find(x=>x.char===c);if(c==='\n'){p.append(document.createElement('br'));prev=null}else if(g){let e=svgGlyph(evalGlyph(g));if(prev&&'AVАВДЛТУ'.includes(prev)&&'OoОо'.includes(c))e.style.marginLeft='-5px';p.append(e);prev=c}else if(!/\s/.test(c))bad.push(c)}document.querySelector('#preview-error').textContent=bad.length?`Outside the Phase 1b repertoire: ${[...new Set(bad)].join(' ')}`:'';Object.entries(state).forEach(([k,v])=>{let e=document.querySelector(`#${k}`);if(e)e.value=v});document.querySelector('#zero-style').value=state.zeroStyle;document.querySelector('#download-project').disabled=false}
+function currentProject(){return {...project,activePreset:state.preset,axes:{weight:state.weight,width:state.width,xHeight:state.xHeight,roundness:state.roundness,aperture:state.aperture},localOverrides:{O:{counter:state.counter}},switches:{aConstruction:state.construction,zeroStyle:state.zeroStyle}}}
+const presets={text:{weight:88,width:1,xHeight:500,roundness:.74,aperture:.58,construction:'double',zeroStyle:'plain'},display:{weight:124,width:1.08,xHeight:520,roundness:.9,aperture:.72,construction:'single',zeroStyle:'slashed'}};
+function controls(){let host=document.querySelector('#axis-controls');[['weight',40,160,1],['width',.85,1.15,.01],['xHeight',460,540,1],['roundness',0,1,.01],['aperture',0,1,.01]].forEach(([id,min,max,step])=>{let d=document.createElement('div');d.innerHTML=`<label for="${id}-number">${id}</label><div class="axis-inputs"><input id="${id}" type="range" min="${min}" max="${max}" step="${step}"><input id="${id}-number" type="number" min="${min}" max="${max}" step="${step}"></div>`;host.append(d);[d.querySelector(`#${id}`),d.querySelector(`#${id}-number`)].forEach(e=>e.oninput=()=>{if(e.validity.valid&&e.value!==''){state[id]=+e.value;state.preset='custom';render()}})});['counter','counter-number'].forEach(id=>document.querySelector(`#${id}`).oninput=e=>{if(e.target.validity.valid){state.counter=+e.target.value;state.preset='custom';render()}});document.querySelector('#construction').oninput=e=>{state.construction=e.target.value;state.preset='custom';render()};document.querySelector('#zero-style').oninput=e=>{state.zeroStyle=e.target.value;state.preset='custom';render()};document.querySelector('#preset').oninput=e=>{state.preset=e.target.value;if(presets[e.target.value])Object.assign(state,presets[e.target.value]);render()};document.querySelector('#specimen').oninput=render;document.querySelector('#compare').onclick=()=>{if(!snapshot){snapshot=JSON.stringify(currentProject());document.querySelector('#compare-status').textContent='A captured; edit controls to compare B.'}else{document.querySelector('#compare-status').textContent=snapshot===JSON.stringify(currentProject())?'A and B are identical.':'A/B differ; both source snapshots are controlled project JSON.'}};document.querySelector('#download-project').onclick=()=>{let u=URL.createObjectURL(new Blob([JSON.stringify(currentProject(),null,2)+'\n'],{type:'application/json'})),a=document.createElement('a');a.href=u;a.download='pfl-phase-1b-project.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),0)}}
+async function init(){project=await (await fetch(new URL('../fontlab/project.json',import.meta.url))).json();glyphs=[...Array.from({length:95},(_,i)=>String.fromCodePoint(32+i)), ' ',...cu,...cl,'́','̈'].map(c=>({char:c,name:name(c),id:`${c.codePointAt(0).toString(16).padStart(4,'0')}`,upper:c===c.toUpperCase()&&c!==c.toLowerCase(),mark:'́̈'.includes(c),kind:/\d/.test(c)?'digit':/[A-Za-zА-Яа-яЁё]/.test(c)?'letter':'common'}));Object.assign(state,project.axes,{counter:project.localOverrides.O.counter,construction:project.switches.aConstruction,zeroStyle:project.switches.zeroStyle,preset:project.activePreset});document.querySelector('#coverage').textContent=`${glyphs.length} glyphs`;controls();window.pfl={glyphs,currentProject,evalGlyph};render()};init().catch(e=>document.querySelector('#preview-error').textContent=e.message);

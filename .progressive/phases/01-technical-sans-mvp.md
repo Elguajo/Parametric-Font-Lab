@@ -50,6 +50,29 @@ checks for all eight Unicode mappings with fontTools 4.66.0.
 Phase 1 remains active: full basic Latin/Russian Cyrillic repertoire, script proofing,
 metrics/kerning, presets and later quality review belong to Phase 1b.
 
+## Phase 1b Execution Record — 2026-09-24
+
+Implemented the bounded `basic-latin-russian-v1` source repertoire: all 95 ASCII Basic
+Latin positions, NBSP, Russian А–Я/а–я including Ё/ё, and combining acute/dieresis
+marks (164 mapped glyphs total).  Every shape is evaluated from original local recipe
+code; no external outline, font, or SVG source is read.  The source validator keeps the
+repertoire selector, five safe axes (`weight`, `width`, `xHeight`, `roundness`,
+`aperture`), O-local counter and the `a`/`0` construction switches bounded.
+
+Recipe output now carries script-aware metric classes and top/bottom mark anchors.  The
+derived UFO persists Latin/Cyrillic UFO3 kerning groups and representative class/exception
+pairs, which compile to a GPOS PairPos lookup.  The browser chart/specimen covers the full
+repertoire, editable Latin/Cyrillic proof text, controlled Text/Display presets and a
+source-snapshot A/B comparison; downloaded JSON retains all selected controls.
+
+Observed verification: five Python source/coverage/axis/metrics/kerning tests, a Chrome
+browser proof at desktop and 375 px, `py_compile`, `git diff --check`, and a full static
+UFO → Designspace → TTF/OTF/WOFF2 export passed.  The compiler validates every expected
+cmap/name mapping and requires a GPOS pair-kerning lookup in each compiled output.
+
+Phase 1 remains active for a native-language optical/type-design review and any corrective
+spacing work it identifies; variable-font compatibility remains Phase 2 work.
+
 ## Phase 1a Review Closure — 2026-09-24
 
 The follow-up review fixed the SVG counter fill: each glyph now uses one nonzero-winding path,
