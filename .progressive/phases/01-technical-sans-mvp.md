@@ -9,20 +9,25 @@ Phase 0 findings and proposed ADRs: `research/font-lab/final/RESEARCH_REPORT.md`
 ## In scope
 - Phase 1a cross-script vertical slice described in the research report §9.
 - Phase 1b full basic Latin + Russian Cyrillic, controlled axes, selected switches, presets/A-B and static export after type quality review.
+- Correct the accepted evidence from `research/font-lab/audits/2026-09-24-product-technical-audit.md`: faithful SVG outline/chart/specimen proofing, the verified `h`/`n`, `U`, and `A` recipe/contour defects, and selected-project export routing.
 
 ## Out of scope
 - Production variable font release, arbitrary morphing, full Bézier editor and other style engines.
 
 ## Tasks
 - [x] Implement and verify Phase 1a source/preview/export vertical slice.
-- [ ] Author and review complete V1 Latin + Russian Cyrillic glyph repertoire.
-- [ ] Add controlled UI, presets/A-B, spacing/kerning and static export validation.
+- [x] Author and review complete V1 Latin + Russian Cyrillic glyph repertoire.
+- [x] Add controlled UI, presets/A-B, spacing/kerning and static export validation.
+- [x] Repair audit findings 1–3 and add outcome-based regressions for browser rendering, recipes and selected-project export.
 
 ## Acceptance criteria
-- [ ] Original recipes generate and preview the agreed repertoire and named variants.
-- [ ] Latin/Cyrillic text, metrics, marks and kerning pass script-aware proof review.
-- [ ] Deterministic project JSON round-trips; static OTF/TTF/WOFF2 compile and pass table/shape checks.
-- [ ] Browser interactions, errors and export work from a clean checkout with pinned dependencies and notices.
+- [x] Original recipes generate and preview the agreed repertoire and named variants.
+- [x] Latin/Cyrillic text, metrics, marks and kerning pass script-aware proof review.
+- [x] Deterministic project JSON round-trips; static OTF/TTF/WOFF2 compile and pass table/shape checks.
+- [x] Browser interactions, errors and export work from a clean checkout with pinned dependencies and notices.
+- [x] The browser outline, chart and specimen represent the current source in the correct coordinate system; combining marks use both source anchor coordinates.
+- [x] `h`/`n` are distinct, `U` has connected stems, and `A` has intentional, valid component winding/joins in the compiled proof.
+- [x] The documented selected-project export invocation compiles that project and fails for an absent or invalid project.
 
 ## Negative / security cases
 - Reject malformed source, invalid axes/switches, incompatible contours and resource-exhausting export requests.
@@ -30,9 +35,25 @@ Phase 0 findings and proposed ADRs: `research/font-lab/final/RESEARCH_REPORT.md`
 
 ## Verification
 - Follow `.progressive/system/QUALITY_PROTOCOL.md`; focused schema/geometry/build/browser tests plus Latin/Cyrillic specimen review.
+- For audit findings 1–3, use rendered browser assertions plus compiled-font proof, recipe topology/contour assertions and a non-default project-export integration test. Passing source-preview parity alone is insufficient.
 
 ## Completion Record
-Pending.
+Status: COMPLETED 2026-09-24.
+
+Final report: `.progressive/completions/01-technical-sans-mvp.md`.
+
+Outcome: original 164-glyph Latin/Cyrillic static Technical Sans workbench with source-faithful
+browser proof and selected-project TTF/OTF/WOFF2 export.
+
+Validation: current and isolated-checkout `npm test`/`npm run export`, Text and Display WOFF2
+proofs at 10/14/24/72 px, Python/JavaScript syntax checks, and diff check passed.
+
+Decision / technical debt: bounded static direction closes Phase 1; variable masters and deferred
+workflow work are post-phase decisions. The proof review is evidence-based agent review, not
+external professional type-design certification.
+
+Handoff: no next implementation phase is scheduled; use the deferred Roadmap request to choose
+future work.
 
 ## Phase 1a Execution Record — 2026-09-24
 
@@ -169,3 +190,107 @@ paired-control synchronization, mark placement, and display-preset source→prev
 parity. The compiler now requires GPOS MarkToBase lookup type 4 in every static
 output. Observed: `npm run test` (10 Python plus browser tests), `npm run export`,
 `py_compile`, `node --check web/app.js`, and `git diff --check` passed.
+
+## Phase 1b Optical Recipe Pass — 2026-09-24
+
+An independent GPT-6 Sol high-reasoning implementation pass turned the remaining
+mechanically testable optical findings into original recipe corrections. Round and
+open Latin/Cyrillic forms now overshoot flat alignments (`O/О/Q/0`, `o/о/e/е/ё`
+and related open forms); open-form terminals overlap their stems at safe weight and
+x-height limits, and their excessive right sidebearings were reduced before adding
+any new kerning. `F/I/M/Z/Г` now have distinct constructions rather than inherited
+near-neighbour skeletons. Bowl–stem joins in `P/R/Р/Ь/Я` and `b/d/p/q/р/ь` overlap
+at the weight extremes while preserving counters.
+
+New recipe regressions cover optical bounds, structural distinction, open-form
+spacing and terminal overlap, and bowl–stem joins/counters at the axis limits.
+The compiler verifies that exported TTF/OTF/WOFF2 preserve the required overshoot
+bounds for representative round/open forms; browser source→preview parity continues
+to cover all 164 glyphs. Observed: `npm run test` (14 Python tests plus Chrome
+proof), `npm run export` (compiled TTF/OTF/WOFF2 bounds/cmap/advance/GPOS and
+WOFF2 proof at 10/14/24/72 px), `py_compile`, `node --check web/app.js`, and
+`git diff --check` passed.
+
+This remains a bounded technical optical pass, not qualified type-design sign-off.
+Phase 1 stays open for a human/qualified script-aware review of the compiled proofs;
+no new kerning pairs, axes, imported outlines, or Modulator-parity work were added.
+
+## Phase 1b Full Compiled Proof Recheck — 2026-09-24
+
+The current uncommitted original-recipe/parity/compiler/test changes were rechecked without
+modifying or committing the worktree. `npm run test` passed all 14 Python recipe tests and the
+Chrome chart/workbench proof. `npm run export` rebuilt the Text TTF/OTF/WOFF2, verified
+tables/optical bounds/cmap/advances/GPOS, and loaded its WOFF2 in Chrome at 10/14/24/72 px.
+`py_compile`, `node --check web/app.js`, and `git diff --check` also passed.
+
+An isolated copy of the current source (excluding `.git`, `.venv`, `node_modules`, and `build`)
+passed the documented README path: `npm run setup`, `npm test`, and `npm run export`. The
+browser test exercised the workbench chart, Text/Display presets, paired controls, A/B,
+combining-mark placement, mobile layout, and versioned JSON download.
+
+For the required full compiled proof, both the Text project
+`fca7a8a9414ffd4a7fd79f972c03d877b82cb5ce444da939d4ca3aaf6853f891` and the actual Display
+preset values (`weight=124`, `width=1.08`, `xHeight=520`, `roundness=.9`, `aperture=.72`,
+single-storey `a`, slashed `0`) were compiled to isolated TTF/OTF/WOFF2 instances. In Chrome,
+each WOFF2 returned HTTP 200 and rendered all 95 Basic Latin positions, NBSP, every Russian
+uppercase/lowercase mapping, targeted round/open/join families, `AV/VA/TO/Ta/To`,
+`АО/ТА/Та/То`, and precomposed/decomposed acute/diaeresis at 10, 14, 24, and 72 px. The proof
+text was unchanged at every size and had non-zero layouts (1408 px width; 75/105/180/630 px
+height). At 72 px, measured GPOS reductions were respectively `AO=5.184`, `AV=4.32`,
+`VA=4.32`, `TO=4.176`, `Ta=3.024`, `To=3.024`, `АО=4.752`, `ТА=3.888`, `Та=3.456`, and
+`То=3.456` px in both instances. Local visual proof captures are in ignored `build/`.
+
+Phase 1 remains IN PROGRESS. These are reproducibility, parity, compiler, rendering and
+mechanical optical observations; they do not constitute the required independent qualified
+script-aware optical/type-design sign-off. No subjective redesign was made without that review.
+
+## Audit Adoption — 2026-09-24
+
+Source: `research/font-lab/audits/2026-09-24-product-technical-audit.md`.
+
+- `ACCEPTED`: findings 1–3 — browser-proof fidelity; named `h`/`n`, `U` and `A` recipe defects; selected-project export routing. These are Phase 1 work.
+- `ALREADY COVERED`: qualified script-aware proof review and static binary validation remain Phase 1 gates.
+- `DEFERRED`: project reopen/save, visual A/B, undo/reset, user-accessible export, broader Modulator parity, shared recipe representation, axis-aware spacing/kerning and Russian usage punctuation. The deferred roadmap change request owns them after Phase 1.
+
+No implementation or consequential architecture decision occurred in this adoption.
+
+## Browser Preview Fidelity Repair — 2026-09-24
+
+Corrected only the audit's browser-proof fidelity finding. The outline, generated glyph
+chart, and specimen now share an explicit font-space-to-SVG transform that maps positive-up
+font coordinates into SVG's positive-down screen space. The chart renders the current
+evaluated contour in an SVG for each of the 164 mapped glyphs, while retaining its character
+label for selection. The specimen carries evaluated source anchors and places combining marks
+by both anchor coordinates: horizontal layout aligns `top.x` to `_top.x`; a vertical SVG
+translation aligns `top.y` to `_top.y`.
+
+Observed validation: the Chromium regression checks 164 chart SVG outlines, source/current
+chart parity, upright cap-height versus baseline, source-anchor parity for Text and Display,
+and actual screen-space X/Y coincidence for acute and diaeresis attachments. `npm test` passed
+14 Python tests plus the browser suite; `npm run export` completed TTF/OTF/WOFF2 compilation
+and compiled WOFF2 proof; `node --check`, `py_compile`, and `git diff --check` passed.
+
+Phase 1 remains in progress. This record does not repair the separate `h`/`n`, `U`, `A`, or
+selected-project export-routing findings, and it is not typographic quality sign-off.
+
+## Audit Recipe and Export Corrections — 2026-09-24
+
+Completed the remaining accepted objective audit findings. Latin `h` now has an ascender and a
+distinct advance from `n`; `n` remains x-height based. The upper and lower `U` stems overlap,
+so compilation removes them into one connected outline. `A` and Cyrillic `А` now give the
+crossbar the same solid winding as their diagonal strokes; compilation retains one intentional
+counter with opposite winding rather than an accidental cutout at a join.
+
+`npm run export` now uses a local launcher that forwards `--project` and `--output-dir` to both
+the Python compiler and the compiled-WOFF2 proof. The new integration regression exports a
+valid non-default project into its own source-hash directory, proves that WOFF2 in Chromium,
+and confirms a missing selected project fails instead of compiling the default source.
+
+Observed validation: `npm test` passed 15 Python tests, Chromium browser proof, and custom
+export-routing integration; `npm run export` passed TTF/OTF/WOFF2 compilation and WOFF2 proof.
+Compiler validation now requires compiled `h`/`n` distinction, one connected `U` outline, and
+an outer `A` outline plus one oppositely wound intentional counter. `py_compile`, JavaScript
+syntax checks, and `git diff --check` passed.
+
+Phase 1 remains in progress pending the independent qualified script-aware optical/type-design
+review. These mechanical corrections are not typographic quality sign-off.

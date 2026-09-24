@@ -12,6 +12,9 @@ import sys
 
 from fontTools import __version__ as fonttools_version
 from fontTools.designspaceLib import DesignSpaceDocument, SourceDescriptor
+from fontTools.pens.areaPen import AreaPen
+from fontTools.pens.boundsPen import BoundsPen
+from fontTools.pens.recordingPen import RecordingPen
 from fontTools.ttLib import TTFont
 from ufoLib2 import Font
 
@@ -165,6 +168,15 @@ def validate_outputs(paths: list[Path], expected_glyphs: list[dict]) -> None:
                 raise RuntimeError(f"{path.name}: missing {glyph_name}")
             if font["hmtx"].metrics[glyph_name][0] != expected_advances[glyph_name]:
                 raise RuntimeError(f"{path.name}: advance for {glyph_name} differs from source")
+        glyph_set = font.getGlyphSet()
+        for glyph_name, flat_top in (("O", 700), ("uni041E", 700), ("C", 700), ("uni0421", 700),
+                                     ("zero", 700), ("o", font["OS/2"].sxHeight),
+                                     ("uni043E", font["OS/2"].sxHeight), ("c", font["OS/2"].sxHeight),
+                                     ("uni0441", font["OS/2"].sxHeight)):
+            bounds_pen = BoundsPen(glyph_set)
+            glyph_set[glyph_name].draw(bounds_pen)
+            if bounds_pen.bounds is None or bounds_pen.bounds[1] > -9 or bounds_pen.bounds[3] < flat_top + 9:
+                raise RuntimeError(f"{path.name}: {glyph_name} lost its optical overshoot")
         if not any(lookup.LookupType == 2 for lookup in font["GPOS"].table.LookupList.Lookup):
             raise RuntimeError(f"{path.name}: missing pair kerning lookup")
         if not any(lookup.LookupType == 4 for lookup in font["GPOS"].table.LookupList.Lookup):
@@ -172,6 +184,33 @@ def validate_outputs(paths: list[Path], expected_glyphs: list[dict]) -> None:
         for pair, value in expected_kerning.items():
             if pair_adjustment(font, *pair) != value:
                 raise RuntimeError(f"{path.name}: kerning for {pair[0]}/{pair[1]} differs from source")
+        glyph_set = font.getGlyphSet()
+        drawings = {}
+        for glyph_name in ("A", "U", "h", "n"):
+            pen = RecordingPen()
+            glyph_set[glyph_name].draw(pen)
+            drawings[glyph_name] = pen.value
+        if font["hmtx"].metrics["h"][0] == font["hmtx"].metrics["n"][0] or drawings["h"] == drawings["n"]:
+            raise RuntimeError(f"{path.name}: h and n remain indistinguishable")
+        if sum(operator == "moveTo" for operator, _ in drawings["U"]) != 1:
+            raise RuntimeError(f"{path.name}: U stems did not compile into one connected outline")
+        if sum(operator == "moveTo" for operator, _ in drawings["A"]) != 2:
+            raise RuntimeError(f"{path.name}: A must compile to one outer outline and one intentional counter")
+        areas = []
+        pen = None
+        for operator, values in drawings["A"]:
+            if operator == "moveTo":
+                pen = AreaPen()
+                pen.moveTo(values[0])
+            elif operator == "lineTo":
+                pen.lineTo(values[0])
+            elif operator == "curveTo":
+                pen.curveTo(*values)
+            elif operator == "closePath":
+                pen.closePath()
+                areas.append(pen.value)
+        if len(areas) != 2 or areas[0] * areas[1] >= 0:
+            raise RuntimeError(f"{path.name}: A counter winding is invalid")
 
 
 def main() -> None:

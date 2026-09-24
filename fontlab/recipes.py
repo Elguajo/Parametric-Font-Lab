@@ -88,16 +88,20 @@ def _advance(d):
     if q.startswith("common-"):return 360
     if q.startswith("digit-"):return 620
     if "upper" in q:return 820 if c in "MWЖШЩЮ" else 420 if c == "I" else 540 if c == "J" else 680
-    return 760 if c in "mwжшщю" else 330 if c in "iljт" else 420 if c in "fr" else 540
+    return 760 if c in "mwжшщю" else 330 if c in "iljт" else 420 if c in "fr" else 560 if c == "h" else 540
 def _scale(contours,f):
     return [[cmd if cmd[0]=="Z" else (cmd[0],*(v*f if i%2==0 else v for i,v in enumerate(cmd[1:]))) for cmd in contour] for contour in contours]
 def _bars(a,h,w,kind):
     l,r,m=80,a-80,a/2; v=lambda x,y0=0,y1=h:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=r:rect(x0,y-w/2,x1,y+w/2)
     if kind in "HН":return [v(l),v(r),bar(h/2)]
-    if kind in "AА":return [stroke(l,0,m,h,w),stroke(r,0,m,h,w),bar(h*.42,l+w,r-w)]
-    if kind in "EFЕе":return [v(l),bar(h),bar(h/2),bar(0)]
-    if kind in "ILTГ":return [bar(h),v(m)]
-    if kind in "MNИ":return [v(l),v(r),stroke(l,0 if kind=="И" else h,r,h if kind=="И" else 0,w)]
+    if kind in "AА":return [stroke(l,0,m,h,w),stroke(r,0,m,h,w),rect(l+w,h*.42-w/2,r-w,h*.42+w/2,True)]
+    if kind in "EЕ":return [v(l),bar(h),bar(h/2),bar(0)]
+    if kind=="F":return [v(l),bar(h),bar(h/2)]
+    if kind=="I":return [bar(h),v(m),bar(0)]
+    if kind=="T":return [bar(h),v(m)]
+    if kind=="Г":return [v(l),bar(h)]
+    if kind=="M":return [v(l),v(r),stroke(l,h,m,0,w),stroke(m,0,r,h,w)]
+    if kind in "NИ":return [v(l),v(r),stroke(l,0 if kind=="И" else h,r,h if kind=="И" else 0,w)]
     if kind=="V":return [stroke(l,h,m,0,w),stroke(r,h,m,0,w)]
     if kind=="X":return [stroke(l,0,r,h,w),stroke(l,h,r,0,w)]
     if kind=="Y":return [stroke(l,h,m,h*.45,w),stroke(r,h,m,h*.45,w),v(m,0,h*.45)]
@@ -105,13 +109,14 @@ def _bars(a,h,w,kind):
     if kind=="Ж":return [v(m),stroke(m,h*.5,l,h,w),stroke(m,h*.5,l,0,w),stroke(m,h*.5,r,h,w),stroke(m,h*.5,r,0,w)]
     if kind=="W":return [stroke(l,h,a*.31,0,w),stroke(a*.31,0,m,h*.42,w),stroke(m,h*.42,a*.69,0,w),stroke(a*.69,0,r,h,w)]
     if kind in "ШЩ":return [v(l),v(m),v(r),bar(0)]
-    if kind in "ZЗ":return [bar(h),bar(h/2),bar(0),v(r)]
+    if kind=="Z":return [bar(h),stroke(r,h,l,0,w),bar(0)]
     if kind in "BВ":return [v(l),*ring(m+40,h*.72,a*.26,h*.25,w,.8),*ring(m+40,h*.27,a*.26,h*.25,w,.8)]
-    if kind in "PRЬЫ":return [v(l),*ring(m+45,h*.52,a*.28,h*.43,w,.8)]
-    if kind in "OCQОФЮ":return [*ring(m,h/2,a*.36,h*.48,w,.8),*([v(m,-40,h+40)] if kind=="Ф" else [])]
+    if kind in "PR":return [v(l),*ring(m,h*.72,a*.38,h*.28,w,.8)]
+    if kind=="Ь":return [v(l),*ring(m,h*.27,a*.38,h*.28,w,.8)]
+    if kind=="Ф":return [*ring(m,h/2,a*.36,h/2+12,w,.8),v(m,-40,h+40)]
     if kind in "CDGСЭ":return [v(l,h*.18,h*.82),bar(h,l+35,r),bar(0,l+35,r)]
     if kind in "ДЛ":return [bar(0,l-35,r+35),stroke(l,0,m,h,w),stroke(r,0,m,h,w)]
-    if kind=="Я":return [v(r),*ring(m-45,h*.62,a*.28,h*.34,w,.8),stroke(m-45,h*.38,l,0,w)]
+    if kind=="Я":return [v(r),*ring(m,h*.70,a*.38,h*.30,w,.8),stroke(m-45,h*.40,l,0,w)]
     if kind in "УуYy":return [stroke(l,h,m,h*.35,w),stroke(r,h,m,h*.35,w),stroke(m,h*.35,l,-180,w)]
     raise ProjectValidationError(f"unreviewed bar construction {kind!r}")
 
@@ -154,7 +159,7 @@ def _common_shape(code,a,w,r):
 
 def _digit_shape(c,a,w,r,p):
     l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
-    if c=="0":return ring(m,350,a*.34,350,w+8,r)+([stroke(a*.27,85,a*.73,615,w*.5)] if p["switches"]["zeroStyle"]=="slashed" else [])
+    if c=="0":return ring(m,350,a*.34,362,w+8,r)+([stroke(a*.27,85,a*.73,615,w*.5)] if p["switches"]["zeroStyle"]=="slashed" else [])
     if c=="1":return [v(m),stroke(a*.32,570,m,700,w),bar(0,a*.32,a*.68)]
     if c=="2":return [bar(700),v(right,400,700),bar(350),v(l,0,350),bar(0)]
     if c=="3":return [bar(700),bar(350),bar(0),v(right)]
@@ -168,17 +173,17 @@ def _digit_shape(c,a,w,r,p):
 
 def _open_round(a,h,w,r,opening,reverse=False):
     l,right=80,a-80
-    if reverse:return [rect(right-w/2,h*.18,right+w/2,h*.82),rect(l+opening,h-w/2,right,h+w/2),rect(l+opening,-w/2,right,w/2)]
-    return [rect(l-w/2,h*.18,l+w/2,h*.82),rect(l,h-w/2,right-opening,h+w/2),rect(l,-w/2,right-opening,w/2)]
+    if reverse:return [rect(right-w/2,0,right+w/2,h),rect(l+opening,h+12-w,right,h+12),rect(l+opening,-12,right,w-12)]
+    return [rect(l-w/2,0,l+w/2,h),rect(l,h+12-w,right-opening,h+12),rect(l,-12,right-opening,w-12)]
 
 def _latin_upper_shape(c,a,w,r,p):
     l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
     if c=="A":return _bars(a,700,w,"A")
     if c=="B":return _bars(a,700,w,"B")
-    if c=="C":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]))
+    if c=="C":return _open_round(a,700,w,r,a*(.06+.12*p["axes"]["aperture"]))
     if c=="D":return [v(l),*ring(m+20,350,a*.30,315,w,r)]
     if c in "EF":return _bars(a,700,w,c)
-    if c=="G":return [*_open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"])),bar(350,m,right)]
+    if c=="G":return [*_open_round(a,700,w,r,a*(.06+.12*p["axes"]["aperture"])),bar(350,m,right)]
     if c=="H":return _bars(a,700,w,"H")
     if c=="I":return _bars(a,700,w,"I")
     if c=="J":return [bar(700),v(right,170,700),bar(0,l,right),v(l,0,170)]
@@ -186,13 +191,13 @@ def _latin_upper_shape(c,a,w,r,p):
     if c=="L":return [v(l),bar(0)]
     if c=="M":return _bars(a,700,w,"M")
     if c=="N":return _bars(a,700,w,"N")
-    if c=="O":return ring(m,350,a*.36,336,w+24*(1-p["localOverrides"]["O"]["counter"]),r)
+    if c=="O":return ring(m,350,a*.36,362,w+24*(1-p["localOverrides"]["O"]["counter"]),r)
     if c=="P":return _bars(a,700,w,"P")
-    if c=="Q":return ring(m,350,a*.36,336,w,r)+[stroke(m,190,right+30,-55,w)]
+    if c=="Q":return ring(m,350,a*.36,362,w,r)+[stroke(m,190,right+30,-55,w)]
     if c=="R":return _bars(a,700,w,"R")+[stroke(m+45,350,right,0,w)]
     if c=="S":return [bar(700),v(l,350,700),bar(350),v(right,0,350),bar(0)]
     if c=="T":return _bars(a,700,w,"T")
-    if c=="U":return [v(l,300,700),v(right,300,700),bar(0),v(l,0,170),v(right,0,170)]
+    if c=="U":return [v(l,160,700),v(right,160,700),bar(0),v(l,0,170),v(right,0,170)]
     if c=="V":return _bars(a,700,w,"V")
     if c=="W":return _bars(a,700,w,"W")
     if c=="X":return _bars(a,700,w,"X")
@@ -208,22 +213,22 @@ def _latin_lower_shape(c,a,h,w,r,p):
     if c=="a":
         if p["switches"]["aConstruction"]=="single":return ring(a*.46,h*.42,a*.32,h*.38,w,r)+[rect(a*.72-w,0,a*.72,h)]
         return _lower_a(a,h,w,r)
-    if c=="b":return [v(l),*ring(m+25,h*.40,a*.31,h*.38,w,r)]
-    if c=="c":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]))
-    if c=="d":return [*ring(m-25,h*.40,a*.31,h*.38,w,r),v(right)]
-    if c=="e":return ring(m,h*.48,a*.32,h*.42,w,r)+[bar(h*.48,l,m)]
+    if c=="b":return [v(l),*ring(m,h*.40,a*.36,h*.40,w,r)]
+    if c=="c":return _open_round(a,h,w,r,a*(.06+.12*p["axes"]["aperture"]))
+    if c=="d":return [*ring(m,h*.40,a*.36,h*.40,w,r),v(right)]
+    if c=="e":return ring(m,h/2,a*.32,h/2+10,w,r)+[bar(h/2,l,m)]
     if c=="f":return [v(m,-90,h),bar(h),bar(h*.48,l,right*.80)]
     if c=="g":return ring(m,h*.45,a*.31,h*.38,w,r)+[v(right,-180,h*.35),bar(0,m,right)]
-    if c=="h":return [v(l),v(right,0,h*.52),bar(h*.52,l,right)]
+    if c=="h":return [v(l,0,700),v(right,0,h*.52),bar(h*.52,l,right)]
     if c=="i":return [v(m,0,h*.62),*ring(m,h+85,w*.52,w*.52,w*.28,r)]
     if c=="j":return [v(m,-180,h*.62),bar(0,l,m),*ring(m,h+85,w*.52,w*.52,w*.28,r)]
     if c=="k":return [v(l),stroke(l,h*.48,right,h,w),stroke(l,h*.48,right,0,w)]
     if c=="l":return [v(m)]
     if c=="m":return [v(l),v(m),v(right),bar(h*.52,l,right)]
-    if c=="n":return [v(l),v(right,0,h*.52),bar(h*.52,l,right)]
-    if c=="o":return ring(m,h*.48,a*.32,h*.42,w,r)
-    if c=="p":return [v(l,-180,h),*ring(m+25,h*.40,a*.31,h*.38,w,r)]
-    if c=="q":return [*ring(m-25,h*.40,a*.31,h*.38,w,r),v(right,-180,h)]
+    if c=="n":return [v(l,0,h),v(right,0,h*.52),bar(h*.52,l,right)]
+    if c=="o":return ring(m,h/2,a*.32,h/2+10,w,r)
+    if c=="p":return [v(l,-180,h),*ring(m,h*.40,a*.36,h*.40,w,r)]
+    if c=="q":return [*ring(m,h*.40,a*.36,h*.40,w,r),v(right,-180,h)]
     if c=="r":return [v(l),bar(h*.55,l,right),stroke(l,h*.55,right,h,w)]
     if c=="s":return [bar(h),v(l,h*.48,h),bar(h*.48),v(right,0,h*.48),bar(0)]
     if c=="t":return [v(m,-30,h),bar(h),bar(0,l,right*.75)]
@@ -252,10 +257,10 @@ def _cyrillic_upper_shape(c,a,w,r,p):
     if c=="Л":return _bars(a,700,w,"Л")
     if c=="М":return _bars(a,700,w,"M")
     if c=="Н":return _bars(a,700,w,"Н")
-    if c=="О":return ring(m,350,a*.36,336,w,r)
+    if c=="О":return ring(m,350,a*.36,362,w,r)
     if c=="П":return [v(l),v(right),bar(700)]
     if c=="Р":return _bars(a,700,w,"P")
-    if c=="С":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]))
+    if c=="С":return _open_round(a,700,w,r,a*(.06+.12*p["axes"]["aperture"]))
     if c=="Т":return _bars(a,700,w,"T")
     if c=="У":return _bars(a,700,w,"У")
     if c=="Ф":return _bars(a,700,w,"Ф")
@@ -267,8 +272,8 @@ def _cyrillic_upper_shape(c,a,w,r,p):
     if c=="Ъ":return [v(l),bar(700),bar(350,m,right),v(m,0,350),*ring(m+50,175,a*.24,175,w,r)]
     if c=="Ы":return [v(l),v(m),bar(700,m,right),bar(350,m,right),*ring(m+75,175,a*.27,175,w,r)]
     if c=="Ь":return _bars(a,700,w,"Ь")
-    if c=="Э":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]),True)+[bar(350,l,m)]
-    if c=="Ю":return [v(l),*ring(m+65,350,a*.28,336,w,r)]
+    if c=="Э":return _open_round(a,700,w,r,a*(.06+.12*p["axes"]["aperture"]),True)+[bar(350,l,m)]
+    if c=="Ю":return [v(l),*ring(m+65,350,a*.28,362,w,r)]
     if c=="Я":return _bars(a,700,w,"Я")
     raise ProjectValidationError(f"unreviewed Cyrillic cap {c!r}")
 
@@ -280,7 +285,7 @@ def _cyrillic_lower_shape(c,a,h,w,r,p):
     if c=="г":return [v(l),bar(h)]
     if c=="д":return [bar(0,l-30,right+30),stroke(l,0,m,h,w),stroke(right,0,m,h,w),stroke(l,0,l-35,-120,w),stroke(right,0,right+35,-120,w)]
     if c in "её":
-        form=ring(m,h*.48,a*.32,h*.42,w,r)+[bar(h*.48,l,m)]
+        form=ring(m,h/2,a*.32,h/2+10,w,r)+[bar(h/2,l,m)]
         return form if c=="е" else form+ring(a*.36,h+95,w*.5,w*.5,w*.28,r)+ring(a*.64,h+95,w*.5,w*.5,w*.28,r)
     if c=="ж":return [v(m),stroke(m,h*.5,l,h,w),stroke(m,h*.5,l,0,w),stroke(m,h*.5,right,h,w),stroke(m,h*.5,right,0,w)]
     if c=="з":return [bar(h),bar(h*.48),bar(0),v(right)]
@@ -290,13 +295,13 @@ def _cyrillic_lower_shape(c,a,h,w,r,p):
     if c=="л":return [stroke(l,0,m,h,w),stroke(right,0,m,h,w)]
     if c=="м":return [v(l),v(right),stroke(l,h,right,h*.45,w),stroke(right,h*.45,m,0,w)]
     if c=="н":return [v(l),v(right),bar(h*.5)]
-    if c=="о":return ring(m,h*.48,a*.32,h*.42,w,r)
+    if c=="о":return ring(m,h/2,a*.32,h/2+10,w,r)
     if c=="п":return [v(l),v(right),bar(h)]
-    if c=="р":return [v(l,-180,h),*ring(m+25,h*.4,a*.31,h*.38,w,r)]
-    if c=="с":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]))
+    if c=="р":return [v(l,-180,h),*ring(m,h*.4,a*.36,h*.4,w,r)]
+    if c=="с":return _open_round(a,h,w,r,a*(.06+.12*p["axes"]["aperture"]))
     if c=="т":return [bar(h),v(m)]
     if c=="у":return _latin_lower_shape("y",a,h,w,r,p)
-    if c=="ф":return ring(m,h*.48,a*.32,h*.42,w,r)+[v(m,-40,h+40)]
+    if c=="ф":return ring(m,h/2,a*.32,h/2+10,w,r)+[v(m,-40,h+40)]
     if c=="х":return _latin_lower_shape("x",a,h,w,r,p)
     if c=="ц":return [v(l),v(right,-120,h),bar(h),bar(0)]
     if c=="ч":return [v(l,h*.5,h),v(right),bar(h*.5,l,right)]
@@ -304,9 +309,9 @@ def _cyrillic_lower_shape(c,a,h,w,r,p):
     if c=="щ":return [v(l),v(m),v(right,-120,h),bar(h),bar(0)]
     if c=="ъ":return [v(l),bar(h),bar(h*.5,m,right),v(m,0,h*.5),*ring(m+50,h*.34,a*.34,h*.36,w,r)]
     if c=="ы":return [v(l),v(m),bar(h,m,right),bar(h*.5,m,right),*ring(m+75,h*.34,a*.32,h*.36,w,r)]
-    if c=="ь":return [v(l),*ring(m+25,h*.4,a*.31,h*.38,w,r)]
-    if c=="э":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]),True)+[bar(h*.48,l,m)]
-    if c=="ю":return [v(l),*ring(m+65,h*.48,a*.32,h*.42,w,r)]
+    if c=="ь":return [v(l),*ring(m,h*.4,a*.36,h*.4,w,r)]
+    if c=="э":return _open_round(a,h,w,r,a*(.06+.12*p["axes"]["aperture"]),True)+[bar(h/2,l,m)]
+    if c=="ю":return [v(l),*ring(m+65,h/2,a*.32,h/2+10,w,r)]
     if c=="я":return [v(right),*ring(m-35,h*.60,a*.32,h*.36,w,r),stroke(m-35,h*.36,l,0,w)]
     raise ProjectValidationError(f"unreviewed Cyrillic lower {c!r}")
 def _shape(d,p):

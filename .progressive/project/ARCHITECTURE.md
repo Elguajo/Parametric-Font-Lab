@@ -1,6 +1,6 @@
 # Architecture — Parametric Font Lab
 
-Status: PHASE 1 IN PROGRESS; Phase 1b static workbench and scoped optical corrections are verified, but full-repertoire optical closure remains open
+Status: PHASE 1 COMPLETE; bounded static source, browser proof, and export pipeline are verified
 
 The implemented workbench has an original deterministic glyph-recipe evaluator and versioned JSON
 source model for 164 mapped glyphs: ASCII Basic Latin, NBSP, Russian А–Я/а–я including Ё/ё and
@@ -10,11 +10,13 @@ compiler emits static TTF, CFF OTF and WOFF2, checks cmap/outline tables and req
 PairPos kerning lookup. Latin/Cyrillic share primitives while retaining script-qualified metrics,
 anchors and kerning groups.
 
-The current browser supports chart/specimen proofing, controlled Text/Display presets, project
-download and source-snapshot A/B comparison. It does not implement Modulator's font selection,
-full parameter breadth, anatomy/tutorial surface, undo/reset history or share flow; those are
-future product work, not present architecture.
+The current browser provides an SVG outline panel, a generated-outline chart, a specimen panel,
+controlled Text/Display presets, project download and source-snapshot A/B status. One shared
+font-to-SVG coordinate transform preserves positive-up source orientation in outline, chart, and
+specimen views; combining marks align both source-anchor coordinates. It does not implement
+project reopening, visual A/B, undo/reset, font selection, full parameter breadth, anatomy/tutorial
+surface, or sharing; those remain deferred product work.
 
-Trust boundary: project JSON is validated before geometry evaluation; later font uploads require a separate sandbox/size-limit design. Browser preview is provisional; Python export is authoritative. PCK phase state remains in `.progressive/`, not in product JSON.
+Trust boundary: project JSON is validated before geometry evaluation; later font uploads require a separate sandbox/size-limit design. Browser SVG is source-faithful proof; the Python compiler is the authoritative exporter. `npm run export` forwards an optional selected project and output directory through compilation and WOFF2 proof. PCK phase state remains in `.progressive/`, not in product JSON.
 
 Research architecture and decision rationale: `research/font-lab/architecture/`, `research/font-lab/decisions/`, and `research/font-lab/final/RESEARCH_REPORT.md`. ADRs are proposed for Phase 1 implementation, not evidence that the system is built.

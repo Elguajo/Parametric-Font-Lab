@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { execFile, spawn } from 'node:child_process';
-import { resolve } from 'node:path';
+import { dirname, relative, resolve, sep } from 'node:path';
 import { promisify } from 'node:util';
 import { chromium } from 'playwright';
 
@@ -8,18 +8,26 @@ const root = resolve('.');
 const python = process.env.PYTHON || resolve('.venv/bin/python');
 const proof = 'АВНОРСХ ДЛЖКУФЯ\nбдлтф ёж AА eе\nAO AV VA TO Ta To АО ТА Та То';
 const execFileAsync = promisify(execFile);
+const options = { project: resolve('fontlab/project.json'), outputDir: resolve('build') };
+for (let index = 2; index < process.argv.length; index += 1) {
+  const option = process.argv[index];
+  const key = option === '--project' ? 'project' : option === '--output-dir' ? 'outputDir' : null;
+  if (!key || !process.argv[index + 1]) throw new Error(`expected --project or --output-dir with a value, received ${option}`);
+  options[key] = resolve(process.argv[index + 1]);
+  index += 1;
+}
 
 async function compiledWoff2() {
-  const { stdout } = await execFileAsync(python, ['-c', 'from fontlab.recipes import load_project, source_hash; print(source_hash(load_project()))'], { cwd: root });
+  const { stdout } = await execFileAsync(python, ['-c', 'import sys; from pathlib import Path; from fontlab.recipes import load_project, source_hash; print(source_hash(load_project(Path(sys.argv[1]))))', options.project], { cwd: root });
   const sourceHash = stdout.trim();
-  const manifest = JSON.parse(await readFile(resolve('build', sourceHash, 'manifest.json'), 'utf8'));
+  const manifest = JSON.parse(await readFile(resolve(options.outputDir, sourceHash, 'manifest.json'), 'utf8'));
   if (manifest.project !== 'pfl-technical-sans-phase-1b' || manifest.sourceHash !== sourceHash) throw new Error('compiled Phase 1b manifest does not match the exported source');
   const font = manifest.fonts.find(path => path.endsWith('.woff2'));
   if (!font) throw new Error('compiled Phase 1b WOFF2 is absent; run npm run export first');
-  return `/build/${sourceHash}/${font}`;
+  return `/${relative(dirname(options.outputDir), resolve(options.outputDir, sourceHash, font)).split(sep).join('/')}`;
 }
 
-const server = spawn(python, ['-m', 'http.server', '8767', '--bind', '127.0.0.1'], { cwd: root, stdio: 'ignore' });
+const server = spawn(python, ['-m', 'http.server', '8767', '--bind', '127.0.0.1', '--directory', dirname(options.outputDir)], { cwd: root, stdio: 'ignore' });
 let browser;
 try {
   const fontUrl = await compiledWoff2();
@@ -27,7 +35,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 850 } });
   const responses = [];
   page.on('response', response => { if (response.url().endsWith('.woff2')) responses.push(response.status()); });
-  await page.goto('http://127.0.0.1:8767/web/', { waitUntil: 'networkidle' });
+  await page.goto('http://127.0.0.1:8767/', { waitUntil: 'networkidle' });
   await page.setContent(`<!doctype html><style>@font-face{font-family:PFLCompiled;src:url('${fontUrl}') format('woff2')}body{font-family:PFLCompiled;font-kerning:normal}.proof{white-space:pre-wrap}</style><div class="proof">${proof}</div>`);
   await page.waitForFunction(() => document.fonts.status === 'loaded' && document.fonts.check('10px PFLCompiled'));
   if (!responses.includes(200)) throw new Error('browser did not load the compiled WOFF2');

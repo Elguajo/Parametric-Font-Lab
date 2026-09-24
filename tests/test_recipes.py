@@ -6,7 +6,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from fontlab.recipes import GLYPH_DEFINITIONS, ProjectValidationError, evaluate_project, kerning_value, load_project, source_hash, validate_glyph, with_controls
+from fontTools.pens.areaPen import AreaPen
+
+from fontlab.recipes import GLYPH_DEFINITIONS, ProjectValidationError, evaluate_project, glyph_signature, kerning_value, load_project, source_hash, validate_glyph, with_controls
 
 
 class Phase1bRecipeTests(unittest.TestCase):
@@ -57,6 +59,97 @@ class Phase1bRecipeTests(unittest.TestCase):
         for name, generic in (("A", "H"), ("uni0410", "uni041D"), ("K", "H"), ("uni041A", "uni041D"), ("uni0416", "uni041D"), ("uni0431", "uni0430"), ("uni0434", "uni0430"), ("uni043B", "uni0430"), ("uni0442", "uni0430"), ("uni0444", "uni0430"), ("uni0435", "uni0430"), ("uni0451", "uni0430")):
             with self.subTest(name=name):
                 self.assertNotEqual(glyphs[name]["contours"], glyphs[generic]["contours"])
+
+    def test_audit_recipe_corrections_are_distinct_connected_and_consistently_wound(self):
+        def bounds(contour):
+            points = [command[1:] for command in contour if command[0] != "Z"]
+            xs = [point[index] for point in points for index in range(0, len(point), 2)]
+            ys = [point[index] for point in points for index in range(1, len(point), 2)]
+            return min(xs), min(ys), max(xs), max(ys)
+
+        def area(contour):
+            pen = AreaPen()
+            for command in contour:
+                if command[0] == "M": pen.moveTo(command[1:])
+                elif command[0] == "L": pen.lineTo(command[1:])
+                elif command[0] == "C": pen.curveTo(command[1:3], command[3:5], command[5:])
+                else: pen.closePath()
+            return pen.value
+
+        for weight in (40, 160):
+            for x_height in (460, 540):
+                with self.subTest(weight=weight, x_height=x_height):
+                    glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, weight=weight, x_height=x_height))["glyphs"]}
+                    self.assertNotEqual(glyphs["h"]["advance"], glyphs["n"]["advance"])
+                    self.assertNotEqual(glyphs["h"]["contours"], glyphs["n"]["contours"])
+                    for upper_stem, lower_stem in ((0, 3), (1, 4)):
+                        self.assertLessEqual(bounds(glyphs["U"]["contours"][upper_stem])[1], bounds(glyphs["U"]["contours"][lower_stem])[3])
+                    self.assertTrue(all(signed_area < 0 for signed_area in map(area, glyphs["A"]["contours"])))
+
+    def test_round_and_open_forms_overshoot_flat_alignment(self):
+        for x_height in (460, 500, 540):
+            glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, x_height=x_height))["glyphs"]}
+            for name in ("O", "Q", "uni041E", "C", "G", "uni0421", "uni042D", "zero"):
+                with self.subTest(name=name, x_height=x_height):
+                    bounds = glyph_signature(glyphs[name])["bounds"]
+                    self.assertLessEqual(bounds[1], -12)
+                    self.assertGreaterEqual(bounds[3], 712)
+            for name in ("o", "e", "c", "uni043E", "uni0435", "uni0451", "uni0441", "uni044D"):
+                with self.subTest(name=name, x_height=x_height):
+                    bounds = glyph_signature(glyphs[name])["bounds"]
+                    self.assertLessEqual(bounds[1], -10)
+                    self.assertGreaterEqual(bounds[3], x_height + 10)
+
+    def test_structural_recipes_and_open_form_spacing(self):
+        glyphs = {glyph["name"]: glyph for glyph in evaluate_project(self.project)["glyphs"]}
+        for name, unlike in (("F", "E"), ("I", "T"), ("M", "N"), ("Z", "S"), ("uni0413", "uni0422")):
+            with self.subTest(name=name):
+                self.assertNotEqual(glyphs[name]["contours"], glyphs[unlike]["contours"])
+        self.assertEqual(len(glyphs["F"]["contours"]), 3)
+        self.assertEqual(len(glyphs["I"]["contours"]), 3)
+        self.assertEqual(len(glyphs["M"]["contours"]), 4)
+        self.assertEqual(len(glyphs["Z"]["contours"]), 3)
+        for name in ("C", "uni0421", "c", "uni0441"):
+            with self.subTest(name=name):
+                right_bearing = glyphs[name]["advance"] - glyph_signature(glyphs[name])["bounds"][2]
+                self.assertLess(right_bearing, 180)
+
+    def test_bowl_stem_joins_and_counters_at_weight_extremes(self):
+        def x_range(contour):
+            xs = [value for command in contour if command[0] != "Z" for value in command[1::2]]
+            return min(xs), max(xs)
+
+        for weight in (40, 160):
+            glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, weight=weight))["glyphs"]}
+            for name, stem_index, bowl_index in (
+                ("P", 0, 1), ("R", 0, 1), ("uni0420", 0, 1), ("uni042C", 0, 1),
+                ("uni042F", 0, 1), ("b", 0, 1), ("d", 2, 0), ("p", 0, 1),
+                ("q", 2, 0), ("uni0440", 0, 1), ("uni044C", 0, 1),
+            ):
+                with self.subTest(name=name, weight=weight):
+                    contours = glyphs[name]["contours"]
+                    stem_left, stem_right = x_range(contours[stem_index])
+                    bowl_left, bowl_right = x_range(contours[bowl_index])
+                    self.assertLessEqual(bowl_left, stem_right)
+                    self.assertGreaterEqual(bowl_right, stem_left)
+                    self.assertGreater(x_range(contours[bowl_index + 1])[1] - x_range(contours[bowl_index + 1])[0], 0)
+
+    def test_open_round_terminals_join_the_stem(self):
+        def y_range(contour):
+            ys = [value for command in contour if command[0] != "Z" for value in command[2::2]]
+            return min(ys), max(ys)
+
+        for weight in (40, 88, 160):
+            for x_height in (460, 540):
+                glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, weight=weight, x_height=x_height))["glyphs"]}
+                for name in ("C", "G", "uni0421", "uni042D", "c", "uni0441", "uni044D"):
+                    with self.subTest(name=name, weight=weight, x_height=x_height):
+                        stem, top, bottom = glyphs[name]["contours"][:3]
+                        stem_bottom, stem_top = y_range(stem)
+                        top_bottom, _ = y_range(top)
+                        _, bottom_top = y_range(bottom)
+                        self.assertGreaterEqual(stem_top, top_bottom)
+                        self.assertLessEqual(stem_bottom, bottom_top)
 
     def test_full_repertoire_has_no_generic_fallback_forms(self):
         glyphs = {glyph["name"]: glyph for glyph in evaluate_project(self.project)["glyphs"]}

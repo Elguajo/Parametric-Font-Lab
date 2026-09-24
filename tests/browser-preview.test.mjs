@@ -13,14 +13,26 @@ try {
   await page.goto('http://127.0.0.1:8765/web/', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.pfl?.glyphs?.length === 164);
   if (await page.locator('.glyph-button').count() !== 164) throw new Error('full Phase 1b chart is incomplete');
+  if (await page.locator('.glyph-button svg.chart-glyph').count() !== 164 || await page.locator('.glyph-button svg.chart-glyph path').count() !== 164) throw new Error('glyph chart does not render every generated outline as SVG');
+  if (await page.locator('[data-glyph="A"] svg.chart-glyph path').getAttribute('d') !== await page.locator('#outline path').getAttribute('d')) throw new Error('glyph chart outline differs from the current generated A outline');
+  const upright = await page.evaluate(() => {
+    const matrix = document.querySelector('#outline g').getScreenCTM();
+    const baseline = new DOMPoint(0, 0).matrixTransform(matrix);
+    const capHeight = new DOMPoint(0, 700).matrixTransform(matrix);
+    return capHeight.y < baseline.y;
+  });
+  if (!upright) throw new Error('font-space cap height renders below the baseline in the SVG preview');
   if (await page.locator('#weight-number').inputValue() !== '88') throw new Error('initial numeric control is not synchronized with source state');
-  const sourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json; from fontlab.recipes import evaluate_project, load_project; print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours')} for g in evaluate_project(load_project())['glyphs']]))"], { cwd: resolve('.'), encoding: 'utf8' }));
+  const sourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json; from fontlab.recipes import evaluate_project, load_project; print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours', 'anchors')} for g in evaluate_project(load_project())['glyphs']]))"], { cwd: resolve('.'), encoding: 'utf8' }));
   const previewGlyphs = await page.evaluate(() => window.pfl.glyphs.map(g => {
     const rendered = window.pfl.evalGlyph(g);
-    return { name: rendered.name, advance: rendered.advance, contours: rendered.contours };
+    return { name: rendered.name, advance: rendered.advance, contours: rendered.contours, anchors: rendered.anchors };
   }));
   const paritySignature = glyphs => JSON.stringify(glyphs, (_key, value) => typeof value === 'number' ? Number(value.toFixed(6)) : value);
-  if (paritySignature(previewGlyphs) !== paritySignature(sourceGlyphs)) throw new Error('browser preview contours, advances, or recipe branches differ from source');
+  if (paritySignature(previewGlyphs) !== paritySignature(sourceGlyphs)) {
+    const mismatch = previewGlyphs.findIndex((glyph, index) => paritySignature(glyph) !== paritySignature(sourceGlyphs[index]));
+    throw new Error(`browser preview contours, advances, or recipe branches differ from source at ${sourceGlyphs[mismatch]?.name || mismatch}`);
+  }
   await page.locator('#weight').evaluate(element => { element.value = '100'; element.dispatchEvent(new Event('input', { bubbles: true })); });
   if (await page.locator('#weight-number').inputValue() !== '100') throw new Error('slider input does not synchronize its numeric companion');
   await page.locator('#weight-number').fill('110');
@@ -54,10 +66,10 @@ try {
   if (await page.locator('#zero-style').inputValue() !== 'slashed') throw new Error('display preset did not control the zero switch');
   if (await page.locator('#weight').inputValue() !== '124' || await page.locator('#weight-number').inputValue() !== '124') throw new Error('preset does not synchronize paired weight controls');
   const displayProject = await page.evaluate(() => window.pfl.currentProject());
-  const displaySourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json, sys; from fontlab.recipes import evaluate_project; project=json.load(sys.stdin); print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours')} for g in evaluate_project(project)['glyphs']]))"], { cwd: resolve('.'), input: JSON.stringify(displayProject), encoding: 'utf8' }));
+  const displaySourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json, sys; from fontlab.recipes import evaluate_project; project=json.load(sys.stdin); print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours', 'anchors')} for g in evaluate_project(project)['glyphs']]))"], { cwd: resolve('.'), input: JSON.stringify(displayProject), encoding: 'utf8' }));
   const displayPreviewGlyphs = await page.evaluate(() => window.pfl.glyphs.map(g => {
     const rendered = window.pfl.evalGlyph(g);
-    return { name: rendered.name, advance: rendered.advance, contours: rendered.contours };
+    return { name: rendered.name, advance: rendered.advance, contours: rendered.contours, anchors: rendered.anchors };
   }));
   if (paritySignature(displayPreviewGlyphs) !== paritySignature(displaySourceGlyphs)) throw new Error('display preset preview differs from source');
   await page.locator('#compare').click();
@@ -72,12 +84,16 @@ try {
   if (await page.locator('#preview-error').textContent()) throw new Error('Cyrillic Ж is absent from preview');
   await page.locator('#specimen').fill('А́ ё');
   await page.waitForFunction(() => document.querySelectorAll('#specimen-preview .glyph').length === 5);
-  const marks = await page.locator('#specimen-preview .glyph').evaluateAll(elements => elements.map(element => {
-    const box = element.getBoundingClientRect();
-    const ink = element.querySelector('path').getBoundingClientRect();
-    return { left: box.left, width: box.width, inkLeft: ink.left, inkWidth: ink.width };
+  const markAttachments = await page.locator('#specimen-preview .glyph').evaluateAll(elements => [[0, 1], [3, 4]].map(([baseIndex, markIndex]) => {
+    const glyphFor = element => window.pfl.evalGlyph(window.pfl.glyphs.find(glyph => glyph.id === element.dataset.glyphId));
+    const pointFor = (element, anchor) => new DOMPoint(...anchor).matrixTransform(element.querySelector('g').getScreenCTM());
+    const base = glyphFor(elements[baseIndex]);
+    const mark = glyphFor(elements[markIndex]);
+    const basePoint = pointFor(elements[baseIndex], base.anchors.top);
+    const markPoint = pointFor(elements[markIndex], mark.anchors._top);
+    return { dx: Math.abs(basePoint.x - markPoint.x), dy: Math.abs(basePoint.y - markPoint.y) };
   }));
-  for (const [base, mark] of [[0, 1], [3, 4]]) if (Math.abs((marks[base].left + marks[base].width / 2) - (marks[mark].inkLeft + marks[mark].inkWidth / 2)) > .1) throw new Error('combining mark is not centred on its base anchor in preview');
+  for (const attachment of markAttachments) if (attachment.dx > .1 || attachment.dy > .1) throw new Error(`combining mark does not use both source anchor coordinates: ${JSON.stringify(attachment)}`);
   await page.setViewportSize({ width: 375, height: 800 });
   if (await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) throw new Error('mobile viewport has horizontal overflow');
   if (errors.length) throw new Error(`browser errors: ${errors.join('; ')}`);
