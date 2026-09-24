@@ -2,15 +2,15 @@
 
 > Volatile hot context. Overwrite on each meaningful handoff; durable phase history belongs in completed phase `Completion Record`s.
 
-Status: REVIEWABLE / GREEN
+Status: QUALITY GATE OPEN — RUNNABLE / GREEN
 
 Current phase: Phase 1 — Geometric/Technical Sans MVP.
-Just completed: Phase 1b repertoire, controlled axes/switches, metrics/kerning, presets and A/B implementation; evidence is in `.progressive/phases/01-technical-sans-mvp.md`.
-Verification: 5 Python coverage/axis/metrics/kerning tests, Chrome full-chart and Latin/Cyrillic proof interactions, `py_compile`, `git diff --check`, and static UFO → Designspace → TTF/OTF/WOFF2 table/cmap/GPOS checks passed.
-Blockers: none. Native-language optical/type-design review is still required before declaring Phase 1 quality-complete; variable compatibility remains a Phase 2 gate.
+Just completed: independent GPT-6 Sol high-reasoning review found and corrected collapsed `V/Y/W` and `З/з` constructions, disconnected `Э/э`, preview mark attachment, width-scaled mark anchors, precomposed/decomposed diaeresis alignment, and paired range/number controls.
+Verification: ten Python recipe tests; Chrome full-repertoire/default+Display source→preview parity and control/mark-placement proof at 10/14/24/72 px; `npm run export` producing validated TTF/OTF/WOFF2 with cmap/advance/GPOS PairPos and MarkToBase checks; compiled-WOFF2 browser proof; `py_compile`; `node --check web/app.js`; and `git diff --check` all passed.
+Blocker: mechanical recipe coverage and export correctness are proven, but the compiled proof still needs a qualified optical/type-design sign-off for its literal modular forms and joins before Phase 1's script-aware proof-review criterion can be closed. Variable compatibility remains a Phase 2 gate. Broader Modulator interaction parity is deferred and is not part of this work.
 
 ## Next action
-Perform the Phase 1 native-language optical/type-design review of the compiled specimens, record concrete spacing/shape findings, and make only those focused corrective edits.
+Conduct the remaining qualified optical/type-design proof of the generated full repertoire; turn the first confirmed form, spacing, mark, or kerning defect into a bounded original-recipe fix, preserving the current axes and excluding the deferred Modulator-parity request.
 
 ## NEXT SESSION PROMPT
-Continue Phase 1 from `.progressive/phases/01-technical-sans-mvp.md`. Preserve the Phase 1b original-source, deterministic-build and bounded-control contracts; use the compiled Latin/Cyrillic specimens for native optical review before claiming the phase quality gate.
+Continue Phase 1 from `.progressive/phases/01-technical-sans-mvp.md`. Use the compiled full-repertoire specimens to complete a qualified optical/type-design proof; fix only confirmed defects in original recipes with regression coverage and rerun the quality protocol. Do not claim Phase 1 closure or begin deferred Modulator-parity work.

@@ -17,7 +17,7 @@ from ufoLib2 import Font
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from fontlab.recipes import KERNING_GROUPS, KERNING_PAIRS, PROJECT_PATH, evaluate_project, load_project, source_hash  # noqa: E402
+from fontlab.recipes import KERNING_GROUPS, KERNING_PAIRS, PROJECT_PATH, evaluate_project, kerning_value, load_project, source_hash  # noqa: E402
 
 BUILD = ROOT / "build"
 
@@ -127,6 +127,29 @@ def compress_woff2(ttf_paths: list[Path]) -> list[Path]:
 
 def validate_outputs(paths: list[Path], expected_glyphs: list[dict]) -> None:
     expected_cmap = {glyph["unicode"]: glyph["name"] for glyph in expected_glyphs}
+    expected_advances = {glyph["name"]: glyph["advance"] for glyph in expected_glyphs}
+    proof_pairs = (("A", "O"), ("A", "V"), ("V", "A"), ("T", "O"), ("T", "a"), ("T", "o"), ("uni0410", "uni041E"), ("uni0422", "uni0410"), ("uni0422", "uni0430"), ("uni0422", "uni043E"))
+    expected_kerning = {pair: kerning_value(*pair) for pair in proof_pairs}
+
+    def pair_adjustment(font: TTFont, left: str, right: str) -> int | None:
+        for lookup in font["GPOS"].table.LookupList.Lookup:
+            if lookup.LookupType != 2:
+                continue
+            for subtable in lookup.SubTable:
+                if left not in subtable.Coverage.glyphs:
+                    continue
+                if subtable.Format == 1:
+                    pair_set = subtable.PairSet[subtable.Coverage.glyphs.index(left)]
+                    for record in pair_set.PairValueRecord:
+                        if record.SecondGlyph == right:
+                            return getattr(record.Value1, "XAdvance", 0) or 0
+                elif subtable.Format == 2:
+                    class1 = subtable.ClassDef1.classDefs.get(left, 0)
+                    class2 = subtable.ClassDef2.classDefs.get(right, 0)
+                    record = subtable.Class1Record[class1].Class2Record[class2]
+                    return getattr(record.Value1, "XAdvance", 0) or 0
+        return None
+
     required_tables = {"head", "hhea", "maxp", "cmap", "name", "GPOS"}
     for path in paths:
         font = TTFont(path)
@@ -140,8 +163,15 @@ def validate_outputs(paths: list[Path], expected_glyphs: list[dict]) -> None:
         for glyph_name in expected_cmap.values():
             if glyph_name not in font.getGlyphOrder():
                 raise RuntimeError(f"{path.name}: missing {glyph_name}")
+            if font["hmtx"].metrics[glyph_name][0] != expected_advances[glyph_name]:
+                raise RuntimeError(f"{path.name}: advance for {glyph_name} differs from source")
         if not any(lookup.LookupType == 2 for lookup in font["GPOS"].table.LookupList.Lookup):
             raise RuntimeError(f"{path.name}: missing pair kerning lookup")
+        if not any(lookup.LookupType == 4 for lookup in font["GPOS"].table.LookupList.Lookup):
+            raise RuntimeError(f"{path.name}: missing mark attachment lookup")
+        for pair, value in expected_kerning.items():
+            if pair_adjustment(font, *pair) != value:
+                raise RuntimeError(f"{path.name}: kerning for {pair[0]}/{pair[1]} differs from source")
 
 
 def main() -> None:

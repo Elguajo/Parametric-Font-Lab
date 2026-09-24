@@ -87,67 +87,251 @@ def _advance(d):
     if c in " \u00a0":return 280
     if q.startswith("common-"):return 360
     if q.startswith("digit-"):return 620
-    if "upper" in q:return 820 if c in "MWЖШЩЮ" else 420 if c in "IЛ" else 680
-    return 760 if c in "mwжшщю" else 330 if c in "ilт" else 540
+    if "upper" in q:return 820 if c in "MWЖШЩЮ" else 420 if c == "I" else 540 if c == "J" else 680
+    return 760 if c in "mwжшщю" else 330 if c in "iljт" else 420 if c in "fr" else 540
 def _scale(contours,f):
     return [[cmd if cmd[0]=="Z" else (cmd[0],*(v*f if i%2==0 else v for i,v in enumerate(cmd[1:]))) for cmd in contour] for contour in contours]
 def _bars(a,h,w,kind):
     l,r,m=80,a-80,a/2; v=lambda x,y0=0,y1=h:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=r:rect(x0,y-w/2,x1,y+w/2)
     if kind in "HН":return [v(l),v(r),bar(h/2)]
-    if kind in "AEFЕ":return [v(l),bar(h),bar(h/2),bar(0)]
+    if kind in "AА":return [stroke(l,0,m,h,w),stroke(r,0,m,h,w),bar(h*.42,l+w,r-w)]
+    if kind in "EFЕе":return [v(l),bar(h),bar(h/2),bar(0)]
     if kind in "ILTГ":return [bar(h),v(m)]
     if kind in "MNИ":return [v(l),v(r),stroke(l,0 if kind=="И" else h,r,h if kind=="И" else 0,w)]
-    if kind in "VXYЖК":return [stroke(l,0,r,h,w),stroke(l,h,r,0,w)]
-    if kind in "WШЩ":return [v(l),v(m),v(r),bar(0)]
+    if kind=="V":return [stroke(l,h,m,0,w),stroke(r,h,m,0,w)]
+    if kind=="X":return [stroke(l,0,r,h,w),stroke(l,h,r,0,w)]
+    if kind=="Y":return [stroke(l,h,m,h*.45,w),stroke(r,h,m,h*.45,w),v(m,0,h*.45)]
+    if kind in "KК":return [v(l),stroke(l,h*.5,r,h,w),stroke(l,h*.5,r,0,w)]
+    if kind=="Ж":return [v(m),stroke(m,h*.5,l,h,w),stroke(m,h*.5,l,0,w),stroke(m,h*.5,r,h,w),stroke(m,h*.5,r,0,w)]
+    if kind=="W":return [stroke(l,h,a*.31,0,w),stroke(a*.31,0,m,h*.42,w),stroke(m,h*.42,a*.69,0,w),stroke(a*.69,0,r,h,w)]
+    if kind in "ШЩ":return [v(l),v(m),v(r),bar(0)]
     if kind in "ZЗ":return [bar(h),bar(h/2),bar(0),v(r)]
-    if kind in "PBRВЬЫ":return [v(l),*ring(m+45,h*.52,a*.28,h*.43,w,.8)]
+    if kind in "BВ":return [v(l),*ring(m+40,h*.72,a*.26,h*.25,w,.8),*ring(m+40,h*.27,a*.26,h*.25,w,.8)]
+    if kind in "PRЬЫ":return [v(l),*ring(m+45,h*.52,a*.28,h*.43,w,.8)]
     if kind in "OCQОФЮ":return [*ring(m,h/2,a*.36,h*.48,w,.8),*([v(m,-40,h+40)] if kind=="Ф" else [])]
     if kind in "CDGСЭ":return [v(l,h*.18,h*.82),bar(h,l+35,r),bar(0,l+35,r)]
     if kind in "ДЛ":return [bar(0,l-35,r+35),stroke(l,0,m,h,w),stroke(r,0,m,h,w)]
+    if kind=="Я":return [v(r),*ring(m-45,h*.62,a*.28,h*.34,w,.8),stroke(m-45,h*.38,l,0,w)]
     if kind in "УуYy":return [stroke(l,h,m,h*.35,w),stroke(r,h,m,h*.35,w),stroke(m,h*.35,l,-180,w)]
-    return [v(l),v(r),bar(h),bar(0)]
+    raise ProjectValidationError(f"unreviewed bar construction {kind!r}")
+
+def _common_shape(code,a,w,r):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    dot=lambda x,y:ring(x,y,w*.55,w*.55,w*.3,r)
+    if code in {32,160}:return []
+    if code==33:return [v(m,150,700),*dot(m,55)]
+    if code==34:return [v(a*.34,510,700),v(a*.66,510,700)]
+    if code==35:return [v(a*.37,80,620),v(a*.63,80,620),bar(470),bar(230)]
+    if code==36:return [bar(700),v(m),bar(350),bar(0),v(l,350,700),v(right,0,350)]
+    if code==37:return [*dot(a*.30,545),*dot(a*.70,155),stroke(a*.24,65,a*.76,635,w*.72)]
+    if code==38:return [bar(700,a*.28,a*.62),v(a*.28,350,700),bar(350,a*.28,a*.72),v(a*.72,0,350),bar(0,a*.38,a*.72),stroke(a*.28,0,a*.72,700,w*.72)]
+    if code in {39,96}:return [stroke(a*.55 if code==39 else a*.45,560,a*.45 if code==39 else a*.55,700,w*.72)]
+    if code==40:return [stroke(a*.62,700,a*.38,350,w),stroke(a*.38,350,a*.62,0,w)]
+    if code==41:return [stroke(a*.38,700,a*.62,350,w),stroke(a*.62,350,a*.38,0,w)]
+    if code==42:return [stroke(m,170,m,530,w*.72),stroke(a*.30,260,a*.70,440,w*.72),stroke(a*.30,440,a*.70,260,w*.72)]
+    if code==43:return [v(m,170,530),bar(350)]
+    if code==44:return [*dot(m,55),stroke(m,25,a*.40,-110,w*.72)]
+    if code==45:return [bar(350)]
+    if code==46:return [*dot(m,55)]
+    if code==47:return [stroke(a*.25,0,a*.75,700,w)]
+    if code==58:return [*dot(m,525),*dot(m,80)]
+    if code==59:return [*dot(m,525),*dot(m,80),stroke(m,50,a*.40,-100,w*.72)]
+    if code==60:return [stroke(a*.68,610,a*.30,350,w),stroke(a*.30,350,a*.68,90,w)]
+    if code==61:return [bar(450),bar(250)]
+    if code==62:return [stroke(a*.32,610,a*.70,350,w),stroke(a*.70,350,a*.32,90,w)]
+    if code==63:return [bar(585,l,a*.62),v(a*.62,390,585),bar(350,a*.44,a*.62),*dot(m,60)]
+    if code==64:return [bar(700),bar(0),v(l),v(right),bar(350,l,right*.72),v(right*.72,180,520)]
+    if code==91:return [bar(700,a*.42,a*.62),v(a*.42),bar(0,a*.42,a*.62)]
+    if code==92:return [stroke(a*.25,700,a*.75,0,w)]
+    if code==93:return [bar(700,a*.38,a*.58),v(a*.58),bar(0,a*.38,a*.58)]
+    if code==94:return [stroke(a*.28,410,m,650,w),stroke(m,650,a*.72,410,w)]
+    if code==95:return [bar(0)]
+    if code==123:return [bar(700,a*.48,a*.66),v(a*.48,390,700),bar(350,a*.48,a*.64),v(a*.48,0,310),bar(0,a*.48,a*.66)]
+    if code==124:return [v(m)]
+    if code==125:return [bar(700,a*.34,a*.52),v(a*.52,390,700),bar(350,a*.36,a*.52),v(a*.52,0,310),bar(0,a*.34,a*.52)]
+    if code==126:return [stroke(a*.24,320,a*.42,390,w*.72),stroke(a*.42,390,a*.60,320,w*.72),stroke(a*.60,320,a*.78,390,w*.72)]
+    raise ProjectValidationError(f"unreviewed common codepoint U+{code:04X}")
+
+def _digit_shape(c,a,w,r,p):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    if c=="0":return ring(m,350,a*.34,350,w+8,r)+([stroke(a*.27,85,a*.73,615,w*.5)] if p["switches"]["zeroStyle"]=="slashed" else [])
+    if c=="1":return [v(m),stroke(a*.32,570,m,700,w),bar(0,a*.32,a*.68)]
+    if c=="2":return [bar(700),v(right,400,700),bar(350),v(l,0,350),bar(0)]
+    if c=="3":return [bar(700),bar(350),bar(0),v(right)]
+    if c=="4":return [v(l,350,700),bar(350),v(right),stroke(l,350,right,700,w)]
+    if c=="5":return [bar(700),v(l,350,700),bar(350),v(right,0,350),bar(0)]
+    if c=="6":return [bar(700),v(l),bar(350),v(right,0,350),bar(0)]
+    if c=="7":return [bar(700),stroke(right,700,l,0,w)]
+    if c=="8":return ring(m,525,a*.29,175,w,r)+ring(m,175,a*.29,175,w,r)
+    if c=="9":return [bar(700),v(l,350,700),bar(350),v(right),bar(0)]
+    raise ProjectValidationError(f"unreviewed digit {c!r}")
+
+def _open_round(a,h,w,r,opening,reverse=False):
+    l,right=80,a-80
+    if reverse:return [rect(right-w/2,h*.18,right+w/2,h*.82),rect(l+opening,h-w/2,right,h+w/2),rect(l+opening,-w/2,right,w/2)]
+    return [rect(l-w/2,h*.18,l+w/2,h*.82),rect(l,h-w/2,right-opening,h+w/2),rect(l,-w/2,right-opening,w/2)]
+
+def _latin_upper_shape(c,a,w,r,p):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    if c=="A":return _bars(a,700,w,"A")
+    if c=="B":return _bars(a,700,w,"B")
+    if c=="C":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]))
+    if c=="D":return [v(l),*ring(m+20,350,a*.30,315,w,r)]
+    if c in "EF":return _bars(a,700,w,c)
+    if c=="G":return [*_open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"])),bar(350,m,right)]
+    if c=="H":return _bars(a,700,w,"H")
+    if c=="I":return _bars(a,700,w,"I")
+    if c=="J":return [bar(700),v(right,170,700),bar(0,l,right),v(l,0,170)]
+    if c=="K":return _bars(a,700,w,"K")
+    if c=="L":return [v(l),bar(0)]
+    if c=="M":return _bars(a,700,w,"M")
+    if c=="N":return _bars(a,700,w,"N")
+    if c=="O":return ring(m,350,a*.36,336,w+24*(1-p["localOverrides"]["O"]["counter"]),r)
+    if c=="P":return _bars(a,700,w,"P")
+    if c=="Q":return ring(m,350,a*.36,336,w,r)+[stroke(m,190,right+30,-55,w)]
+    if c=="R":return _bars(a,700,w,"R")+[stroke(m+45,350,right,0,w)]
+    if c=="S":return [bar(700),v(l,350,700),bar(350),v(right,0,350),bar(0)]
+    if c=="T":return _bars(a,700,w,"T")
+    if c=="U":return [v(l,300,700),v(right,300,700),bar(0),v(l,0,170),v(right,0,170)]
+    if c=="V":return _bars(a,700,w,"V")
+    if c=="W":return _bars(a,700,w,"W")
+    if c=="X":return _bars(a,700,w,"X")
+    if c=="Y":return _bars(a,700,w,"Y")
+    if c=="Z":return _bars(a,700,w,"Z")
+    raise ProjectValidationError(f"unreviewed Latin cap {c!r}")
+
+def _lower_a(a,h,w,r):
+    return ring(a*.43,h*.40,a*.32,h*.38,w,r)+[rect(a*.70-w,0,a*.70,h),rect(a*.43,h*.42,a*.70,h*.42+w)]
+
+def _latin_lower_shape(c,a,h,w,r,p):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=h:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    if c=="a":
+        if p["switches"]["aConstruction"]=="single":return ring(a*.46,h*.42,a*.32,h*.38,w,r)+[rect(a*.72-w,0,a*.72,h)]
+        return _lower_a(a,h,w,r)
+    if c=="b":return [v(l),*ring(m+25,h*.40,a*.31,h*.38,w,r)]
+    if c=="c":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]))
+    if c=="d":return [*ring(m-25,h*.40,a*.31,h*.38,w,r),v(right)]
+    if c=="e":return ring(m,h*.48,a*.32,h*.42,w,r)+[bar(h*.48,l,m)]
+    if c=="f":return [v(m,-90,h),bar(h),bar(h*.48,l,right*.80)]
+    if c=="g":return ring(m,h*.45,a*.31,h*.38,w,r)+[v(right,-180,h*.35),bar(0,m,right)]
+    if c=="h":return [v(l),v(right,0,h*.52),bar(h*.52,l,right)]
+    if c=="i":return [v(m,0,h*.62),*ring(m,h+85,w*.52,w*.52,w*.28,r)]
+    if c=="j":return [v(m,-180,h*.62),bar(0,l,m),*ring(m,h+85,w*.52,w*.52,w*.28,r)]
+    if c=="k":return [v(l),stroke(l,h*.48,right,h,w),stroke(l,h*.48,right,0,w)]
+    if c=="l":return [v(m)]
+    if c=="m":return [v(l),v(m),v(right),bar(h*.52,l,right)]
+    if c=="n":return [v(l),v(right,0,h*.52),bar(h*.52,l,right)]
+    if c=="o":return ring(m,h*.48,a*.32,h*.42,w,r)
+    if c=="p":return [v(l,-180,h),*ring(m+25,h*.40,a*.31,h*.38,w,r)]
+    if c=="q":return [*ring(m-25,h*.40,a*.31,h*.38,w,r),v(right,-180,h)]
+    if c=="r":return [v(l),bar(h*.55,l,right),stroke(l,h*.55,right,h,w)]
+    if c=="s":return [bar(h),v(l,h*.48,h),bar(h*.48),v(right,0,h*.48),bar(0)]
+    if c=="t":return [v(m,-30,h),bar(h),bar(0,l,right*.75)]
+    if c=="u":return [v(l,h*.48,h),v(right),bar(0),v(l,0,h*.22)]
+    if c=="v":return [stroke(l,h,m,0,w),stroke(right,h,m,0,w)]
+    if c=="w":return [stroke(l,h,a*.31,0,w),stroke(a*.31,0,m,h*.42,w),stroke(m,h*.42,a*.69,0,w),stroke(a*.69,0,right,h,w)]
+    if c=="x":return [stroke(l,0,right,h,w),stroke(l,h,right,0,w)]
+    if c=="y":return [stroke(l,h,m,h*.35,w),stroke(right,h,m,h*.35,w),stroke(m,h*.35,l,-180,w)]
+    if c=="z":return [bar(h),stroke(right,h,l,0,w),bar(0)]
+    raise ProjectValidationError(f"unreviewed Latin lower {c!r}")
+
+def _cyrillic_upper_shape(c,a,w,r,p):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    if c=="А":return _bars(a,700,w,"А")
+    if c=="Б":return [v(l),bar(700),bar(350),*ring(m+28,175,a*.31,175,w,r)]
+    if c=="В":return _bars(a,700,w,"В")
+    if c=="Г":return _bars(a,700,w,"Г")
+    if c=="Д":return _bars(a,700,w,"Д")
+    if c=="Е":return _bars(a,700,w,"Е")
+    if c=="Ё":return _bars(a,700,w,"Е")+ring(a*.36,800,w*.5,w*.5,w*.28,r)+ring(a*.64,800,w*.5,w*.5,w*.28,r)
+    if c=="Ж":return _bars(a,700,w,"Ж")
+    if c=="З":return [bar(700),bar(350),bar(0),v(right)]
+    if c=="И":return _bars(a,700,w,"И")
+    if c=="Й":return _bars(a,700,w,"И")+[stroke(a*.34,785,m,845,w*.42),stroke(m,845,a*.66,785,w*.42)]
+    if c=="К":return _bars(a,700,w,"К")
+    if c=="Л":return _bars(a,700,w,"Л")
+    if c=="М":return _bars(a,700,w,"M")
+    if c=="Н":return _bars(a,700,w,"Н")
+    if c=="О":return ring(m,350,a*.36,336,w,r)
+    if c=="П":return [v(l),v(right),bar(700)]
+    if c=="Р":return _bars(a,700,w,"P")
+    if c=="С":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]))
+    if c=="Т":return _bars(a,700,w,"T")
+    if c=="У":return _bars(a,700,w,"У")
+    if c=="Ф":return _bars(a,700,w,"Ф")
+    if c=="Х":return _bars(a,700,w,"X")
+    if c=="Ц":return [v(l),v(right,-120,700),bar(700),bar(0)]
+    if c=="Ч":return [v(l,350,700),v(right),bar(350,l,right)]
+    if c=="Ш":return _bars(a,700,w,"Ш")
+    if c=="Щ":return [v(l),v(m),v(right,-120,700),bar(700),bar(0)]
+    if c=="Ъ":return [v(l),bar(700),bar(350,m,right),v(m,0,350),*ring(m+50,175,a*.24,175,w,r)]
+    if c=="Ы":return [v(l),v(m),bar(700,m,right),bar(350,m,right),*ring(m+75,175,a*.27,175,w,r)]
+    if c=="Ь":return _bars(a,700,w,"Ь")
+    if c=="Э":return _open_round(a,700,w,r,a*(.10+.20*p["axes"]["aperture"]),True)+[bar(350,l,m)]
+    if c=="Ю":return [v(l),*ring(m+65,350,a*.28,336,w,r)]
+    if c=="Я":return _bars(a,700,w,"Я")
+    raise ProjectValidationError(f"unreviewed Cyrillic cap {c!r}")
+
+def _cyrillic_lower_shape(c,a,h,w,r,p):
+    l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=h:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
+    if c=="а":return _lower_a(a,h,w,r)
+    if c=="б":return [bar(h),v(l),*ring(m+25,h*.4,a*.36,h*.38,w,r)]
+    if c=="в":return [v(l),*ring(m+30,h*.70,a*.34,h*.36,w,r),*ring(m+30,h*.25,a*.34,h*.36,w,r)]
+    if c=="г":return [v(l),bar(h)]
+    if c=="д":return [bar(0,l-30,right+30),stroke(l,0,m,h,w),stroke(right,0,m,h,w),stroke(l,0,l-35,-120,w),stroke(right,0,right+35,-120,w)]
+    if c in "её":
+        form=ring(m,h*.48,a*.32,h*.42,w,r)+[bar(h*.48,l,m)]
+        return form if c=="е" else form+ring(a*.36,h+95,w*.5,w*.5,w*.28,r)+ring(a*.64,h+95,w*.5,w*.5,w*.28,r)
+    if c=="ж":return [v(m),stroke(m,h*.5,l,h,w),stroke(m,h*.5,l,0,w),stroke(m,h*.5,right,h,w),stroke(m,h*.5,right,0,w)]
+    if c=="з":return [bar(h),bar(h*.48),bar(0),v(right)]
+    if c=="и":return [v(l),v(right),stroke(l,0,right,h,w)]
+    if c=="й":return [v(l),v(right),stroke(l,0,right,h,w),stroke(a*.34,h+70,m,h+125,w*.42),stroke(m,h+125,a*.66,h+70,w*.42)]
+    if c=="к":return [v(l),stroke(l,h*.5,right,h,w),stroke(l,h*.5,right,0,w)]
+    if c=="л":return [stroke(l,0,m,h,w),stroke(right,0,m,h,w)]
+    if c=="м":return [v(l),v(right),stroke(l,h,right,h*.45,w),stroke(right,h*.45,m,0,w)]
+    if c=="н":return [v(l),v(right),bar(h*.5)]
+    if c=="о":return ring(m,h*.48,a*.32,h*.42,w,r)
+    if c=="п":return [v(l),v(right),bar(h)]
+    if c=="р":return [v(l,-180,h),*ring(m+25,h*.4,a*.31,h*.38,w,r)]
+    if c=="с":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]))
+    if c=="т":return [bar(h),v(m)]
+    if c=="у":return _latin_lower_shape("y",a,h,w,r,p)
+    if c=="ф":return ring(m,h*.48,a*.32,h*.42,w,r)+[v(m,-40,h+40)]
+    if c=="х":return _latin_lower_shape("x",a,h,w,r,p)
+    if c=="ц":return [v(l),v(right,-120,h),bar(h),bar(0)]
+    if c=="ч":return [v(l,h*.5,h),v(right),bar(h*.5,l,right)]
+    if c=="ш":return [v(l),v(m),v(right),bar(h),bar(0)]
+    if c=="щ":return [v(l),v(m),v(right,-120,h),bar(h),bar(0)]
+    if c=="ъ":return [v(l),bar(h),bar(h*.5,m,right),v(m,0,h*.5),*ring(m+50,h*.34,a*.34,h*.36,w,r)]
+    if c=="ы":return [v(l),v(m),bar(h,m,right),bar(h*.5,m,right),*ring(m+75,h*.34,a*.32,h*.36,w,r)]
+    if c=="ь":return [v(l),*ring(m+25,h*.4,a*.31,h*.38,w,r)]
+    if c=="э":return _open_round(a,h,w,r,a*(.12+.18*p["axes"]["aperture"]),True)+[bar(h*.48,l,m)]
+    if c=="ю":return [v(l),*ring(m+65,h*.48,a*.32,h*.42,w,r)]
+    if c=="я":return [v(right),*ring(m-35,h*.60,a*.32,h*.36,w,r),stroke(m-35,h*.36,l,0,w)]
+    raise ProjectValidationError(f"unreviewed Cyrillic lower {c!r}")
 def _shape(d,p):
     q,c,a,w,r,xh=d["recipe"],chr(d["unicode"]),_advance(d),p["axes"]["weight"],p["axes"]["roundness"],p["axes"]["xHeight"]
-    h=700 if "upper" in q or q.startswith("digit-") else xh
     if q=="mark-acute":return [stroke(180,720,340,890,w*.5)]
     if q=="mark-dieresis":return ring(180,800,w*.52,w*.52,w*.28,r)+ring(340,800,w*.52,w*.52,w*.28,r)
-    if q.startswith("common-"):
-        code=d["unicode"]
-        if code in {32,160}:return []
-        if code in {45,95}:return [rect(a*.18,(350 if code==45 else 0)-w/2,a*.82,(350 if code==45 else 0)+w/2)]
-        if code in {46,44,58,59}:return ring(a/2,50,w*.55,w*.55,w*.3,r)+(ring(a/2,390,w*.55,w*.55,w*.3,r) if code in {58,59} else [])
-        if code in {47,92}:return [stroke(a*.25,0,a*.75,700,w)]
-        return [rect(a/2-w/2,0,a/2+w/2,700)]
-    if q.startswith("digit-"):
-        if c=="0":return ring(a/2,350,a*.34,350,w+8,r)+([stroke(a*.27,85,a*.73,615,w*.5)] if p["switches"]["zeroStyle"]=="slashed" else [])
-        return _bars(a,700,w,c if c not in "123456789" else "Z")
-    if q.startswith("latin-lower-"):
-        if c=="a" and p["switches"]["aConstruction"]=="single":return ring(a*.46,xh*.42,a*.29,xh*.38,w,r)+[rect(a*.72-w,0,a*.72,xh)]
-        if c in "ocedqbpg":return ring(a/2,xh*.48,a*.32,xh*.42,w,r)+([rect(a*.72-w,-180,a*.72,xh)] if c in "dqpgb" else [])
-        return _bars(a,xh,w,c)
-    if q.startswith("cyrillic-lower-"):
-        if c=="ё":return _bars(a,xh,w,"е")+ring(a*.36,xh+95,w*.5,w*.5,w*.28,r)+ring(a*.64,xh+95,w*.5,w*.5,w*.28,r)
-        return _bars(a,xh,w,c)
-    if q.startswith("cyrillic-upper-"):
-        if c=="Ё":return _bars(a,700,w,"Е")+ring(a*.36,790,w*.5,w*.5,w*.28,r)+ring(a*.64,790,w*.5,w*.5,w*.28,r)
-        return _bars(a,700,w,c)
-    if c in "CcСсЭэ":
-        l,r=80,a-80; opening=a*(.10+.20*p["axes"]["aperture"])
-        return [rect(l-w/2,h*.18,l+w/2,h*.82),rect(l,h-w/2,r-opening,h+w/2),rect(l,-w/2,r-opening,w/2)]
-    if q.startswith("latin-upper-") and c=="O":return ring(a/2,350,a*.36,336,w+24*(1-p["localOverrides"]["O"]["counter"]),r)
-    return _bars(a,700,w,c)
+    if q.startswith("common-") or q=="blank-nbsp":return _common_shape(d["unicode"],a,w,r)
+    if q.startswith("digit-"):return _digit_shape(c,a,w,r,p)
+    if q.startswith("latin-upper-"):return _latin_upper_shape(c,a,w,r,p)
+    if q.startswith("latin-lower-"):return _latin_lower_shape(c,a,xh,w,r,p)
+    if q.startswith("cyrillic-upper-"):return _cyrillic_upper_shape(c,a,w,r,p)
+    if q.startswith("cyrillic-lower-"):return _cyrillic_lower_shape(c,a,xh,w,r,p)
+    raise ProjectValidationError(f"unreviewed recipe {q!r}")
 def _metrics_class(d):
     q=d["recipe"]
     return "mark" if q.startswith("mark-") else "punctuation" if q.startswith(("common-","blank-")) else "tabular" if q.startswith("digit-") else "cyrillic" if q.startswith("cyrillic-") else "latin"
 def _anchors(d,a,p):
     q=d["recipe"]
-    if q.startswith("mark-"):return {"_top":(0,720)}
+    if q.startswith("mark-"):return {"_top":(260*p["axes"]["width"],760)}
     if "upper" in q:return {"top":(a/2,760),"bottom":(a/2,0)}
     if "lower" in q:return {"top":(a/2,p["axes"]["xHeight"]+55),"bottom":(a/2,0)}
     return {}
 
-KERNING_GROUPS={"public.kern1.Latn.diagonal":["A","V","W","Y"],"public.kern2.Latn.round":["O","C","G","Q","o","c","e"],"public.kern1.Cyrl.diagonal":["uni0414","uni041b","uni0423","uni0422","uni0416","uni0425"],"public.kern2.Cyrl.round":["uni041e","uni0421","uni0424","uni042e","uni043e","uni0441","uni044d","uni044e","uni0444"]}
-KERNING_PAIRS={("public.kern1.Latn.diagonal","public.kern2.Latn.round"):-72,("public.kern1.Cyrl.diagonal","public.kern2.Cyrl.round"):-66,("T","o"):-42,("uni0422","uni043e"):-48}
+KERNING_GROUPS={"public.kern1.Latn.diagonal":["A","V","W","Y"],"public.kern2.Latn.round":["O","C","G","Q","o","c","e"],"public.kern1.Cyrl.diagonal":["uni0410","uni0414","uni041B","uni0423","uni0422","uni0416","uni0425"],"public.kern2.Cyrl.round":["uni041E","uni0421","uni0424","uni042E","uni043E","uni0441","uni044D","uni044E","uni0444"]}
+KERNING_PAIRS={("public.kern1.Latn.diagonal","public.kern2.Latn.round"):-72,("public.kern1.Cyrl.diagonal","public.kern2.Cyrl.round"):-66,("A","V"):-60,("V","A"):-60,("A","W"):-44,("A","Y"):-52,("T","A"):-52,("T","O"):-58,("T","a"):-42,("T","o"):-42,("uni0422","uni0410"):-54,("uni0422","uni0430"):-48,("uni0422","uni043E"):-48}
 def kerning_value(left,right):
     if (left,right) in KERNING_PAIRS:return KERNING_PAIRS[(left,right)]
     lg=[k for k,v in KERNING_GROUPS.items() if k.startswith("public.kern1") and left in v]; rg=[k for k,v in KERNING_GROUPS.items() if k.startswith("public.kern2") and right in v]

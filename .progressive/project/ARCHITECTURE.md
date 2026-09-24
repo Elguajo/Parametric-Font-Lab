@@ -1,13 +1,19 @@
 # Architecture — Parametric Font Lab
 
-Status: PHASE 1 IN PROGRESS; Phase 1a runtime and static compiler implemented
+Status: PHASE 1 IN PROGRESS; Phase 1b static workbench and scoped optical corrections are verified, but full-repertoire optical closure remains open
 
-Phase 1a contains an original deterministic glyph-recipe evaluator, versioned JSON source model,
-browser SVG preview and isolated Python compiler for the cross-script `H/O/a/0` and `Н/О/а/о`
-slice. Derived UFO and Designspace sources feed fontmake/fontTools for validated static binaries.
-Latin and Cyrillic share metrics/primitives but own script-specific recipes and quality tests;
-structural variants use separate topology families. Phase 1b extends the repertoire and adds
-type-quality, spacing and kerning work.
+The implemented workbench has an original deterministic glyph-recipe evaluator and versioned JSON
+source model for 164 mapped glyphs: ASCII Basic Latin, NBSP, Russian А–Я/а–я including Ё/ё and
+combining acute/dieresis. Five bounded source controls, O-local counter and discrete `a`/`0`
+branches produce browser SVG previews and derived UFO/Designspace sources. The isolated Python
+compiler emits static TTF, CFF OTF and WOFF2, checks cmap/outline tables and requires a GPOS
+PairPos kerning lookup. Latin/Cyrillic share primitives while retaining script-qualified metrics,
+anchors and kerning groups.
+
+The current browser supports chart/specimen proofing, controlled Text/Display presets, project
+download and source-snapshot A/B comparison. It does not implement Modulator's font selection,
+full parameter breadth, anatomy/tutorial surface, undo/reset history or share flow; those are
+future product work, not present architecture.
 
 Trust boundary: project JSON is validated before geometry evaluation; later font uploads require a separate sandbox/size-limit design. Browser preview is provisional; Python export is authoritative. PCK phase state remains in `.progressive/`, not in product JSON.
 

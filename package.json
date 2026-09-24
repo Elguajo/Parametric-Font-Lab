@@ -7,7 +7,7 @@
     "test:python": ".venv/bin/python -m unittest discover -s tests -v",
     "test:browser": "node tests/browser-preview.test.mjs",
     "test": "npm run test:python && npm run test:browser",
-    "export": ".venv/bin/python tools/build_font.py"
+    "export": ".venv/bin/python tools/build_font.py && node tests/compiled-font-proof.test.mjs"
   },
   "devDependencies": {
     "playwright": "1.58.0"

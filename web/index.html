@@ -1,1 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Parametric Font Lab — Phase 1b</title><link rel="stylesheet" href="styles.css"></head><body><main><header><p class="eyebrow">PFL / PHASE 1B</p><h1>Technical Sans</h1><p class="summary">Original Basic Latin and Russian Cyrillic workbench with metrics, kerning and controlled A/B.</p></header><section class="workbench"><form class="controls"><h2>Construction</h2><label for="preset">Preset</label><select id="preset"><option value="text">Text</option><option value="display">Display</option><option value="custom">Custom</option></select><div id="axis-controls"></div><label for="counter-number">Latin O counter</label><div class="axis-inputs"><input id="counter" type="range" min="0.5" max="1.5" step=".01"><input id="counter-number" type="number" min="0.5" max="1.5" step=".01"></div><label for="construction">Latin a construction</label><select id="construction"><option value="double">Double-storey</option><option value="single">Single-storey</option></select><label for="zero-style">Zero construction</label><select id="zero-style"><option value="plain">Plain</option><option value="slashed">Slashed</option></select><button id="compare" type="button">Capture A / compare B</button><p id="compare-status" class="scope"></p><button id="download-project" type="button" disabled>Download project JSON</button></form><section class="preview-panel"><div class="outline-head"><h2>Outline preview</h2><span id="selected-name"></span></div><svg id="outline" viewBox="0 -180 820 1100" role="img" aria-label="Selected glyph outline"></svg><label class="specimen-label" for="specimen">Editable Latin / Cyrillic proof</label><textarea id="specimen" rows="3">AVATAR — СТРОКА\nАВНОРСХ ДЛЖКУФЯ ёж AА eе</textarea><div id="specimen-preview" class="specimen-preview"></div><p id="preview-error" class="error" role="alert"></p></section><section class="chart-panel"><h2>Glyph chart <span id="coverage"></span></h2><div id="chart" class="chart"></div></section></section></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parametric Font Lab — Phase 1b</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">PFL / PHASE 1B</p>
+      <h1>Technical Sans</h1>
+      <p class="summary">Original Basic Latin and Russian Cyrillic workbench with metrics, kerning and controlled A/B.</p>
+    </header>
+    <section class="workbench">
+      <form class="controls">
+        <h2>Construction</h2>
+        <label for="preset">Preset</label><select id="preset"><option value="text">Text</option><option value="display">Display</option><option value="custom">Custom</option></select>
+        <div id="axis-controls"></div>
+        <label for="counter-number">Latin O counter</label><div class="axis-inputs"><input id="counter" type="range" min="0.5" max="1.5" step=".01"><input id="counter-number" type="number" min="0.5" max="1.5" step=".01"></div>
+        <label for="construction">Latin a construction</label><select id="construction"><option value="double">Double-storey</option><option value="single">Single-storey</option></select>
+        <label for="zero-style">Zero construction</label><select id="zero-style"><option value="plain">Plain</option><option value="slashed">Slashed</option></select>
+        <button id="compare" type="button">Capture A / compare B</button><p id="compare-status" class="scope"></p><button id="download-project" type="button" disabled>Download project JSON</button>
+      </form>
+      <section class="preview-panel">
+        <div class="outline-head"><h2>Outline preview</h2><span id="selected-name"></span></div>
+        <svg id="outline" viewBox="0 -180 820 1100" role="img" aria-label="Selected glyph outline"></svg>
+        <label class="specimen-label" for="specimen">Editable Latin / Cyrillic proof</label>
+        <textarea id="specimen" rows="3">AVATAR - СТРОКА
+АВНОРСХ ДЛЖКУФЯ ёж AА eе</textarea>
+        <div id="specimen-preview" class="specimen-preview"></div><p id="preview-error" class="error" role="alert"></p>
+      </section>
+      <section class="chart-panel"><h2>Glyph chart <span id="coverage"></span></h2><div id="chart" class="chart"></div></section>
+    </section>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

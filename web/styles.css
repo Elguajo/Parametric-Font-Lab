@@ -24,7 +24,10 @@ button#download-project:disabled { opacity: .45; cursor: default; }
 #outline { display: block; width: min(100%, 360px); height: 330px; margin: 6px auto 18px; background: #f3f0e9; }
 #outline path, .glyph path { fill: #111213; fill-rule: nonzero; }
 .specimen-preview { display: flex; flex-wrap: wrap; min-height: 76px; margin-top: 14px; padding: 8px; background: #f3f0e9; color: #111213; }
-.glyph { width: 46px; height: 58px; } .glyph.space { width: 14px; }
+.proof-size { display: flex; gap: 6px; margin-top: 10px; }
+.proof-size button { border: 1px solid #5c5e58; background: #1e201f; color: inherit; cursor: pointer; padding: 5px 7px; }
+.proof-size button[aria-pressed="true"] { border-color: #d6ff00; color: #d6ff00; }
+.glyph { display: block; flex: 0 0 auto; } .glyph.space { min-width: 4px; }
 .chart { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .glyph-button { display: grid; grid-template-columns: 1fr 24px; align-items: center; min-height: 78px; border: 1px solid #41433f; background: #1e201f; color: inherit; cursor: pointer; text-align: left; }
 .glyph-button[aria-pressed="true"] { border-color: #d6ff00; }.glyph-button svg { width: 100%; height: 64px; background: #f3f0e9; }.glyph-button span { text-align: center; }

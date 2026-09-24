@@ -11,3 +11,11 @@ the production font pipeline before implementation.
 
 Goal:
 Implement the original cross-script vertical slice, then complete a quality-reviewed Latin + Russian Cyrillic static font workbench.
+
+## Deferred change request — broader Modulator interaction parity
+- [ ] After Phase 1 quality closure, decide whether the product needs anatomy guidance, undo/reset history, sharing, additional parameter families, or multi-family selection.
+
+Reason:
+The public Modulator interface is a useful interaction reference, but these capabilities materially
+expand product scope and validation surface. They are intentionally not scheduled before the static
+type-quality gate. Source: https://www.metaflop.com/modulator

@@ -46,9 +46,69 @@ class Phase1bRecipeTests(unittest.TestCase):
         self.assertEqual(glyphs["acutecomb"]["advance"], 0)
         self.assertIn("top", glyphs["uni0401"]["anchors"])
         self.assertLess(kerning_value("A", "O"), 0)
-        self.assertLess(kerning_value("uni0414", "uni041e"), 0)
+        self.assertLess(kerning_value("uni0414", "uni041E"), 0)
         self.assertLess(kerning_value("T", "o"), 0)
-        self.assertLess(kerning_value("uni0422", "uni043e"), 0)
+        self.assertLess(kerning_value("uni0422", "uni043E"), 0)
+
+    def test_native_proof_recipes_have_distinct_forms_and_expected_width(self):
+        glyphs = {glyph["name"]: glyph for glyph in evaluate_project(self.project)["glyphs"]}
+        self.assertEqual(glyphs["uni041B"]["advance"], 680)
+        self.assertEqual(glyphs["e"]["contours"], glyphs["uni0435"]["contours"])
+        for name, generic in (("A", "H"), ("uni0410", "uni041D"), ("K", "H"), ("uni041A", "uni041D"), ("uni0416", "uni041D"), ("uni0431", "uni0430"), ("uni0434", "uni0430"), ("uni043B", "uni0430"), ("uni0442", "uni0430"), ("uni0444", "uni0430"), ("uni0435", "uni0430"), ("uni0451", "uni0430")):
+            with self.subTest(name=name):
+                self.assertNotEqual(glyphs[name]["contours"], glyphs[generic]["contours"])
+
+    def test_full_repertoire_has_no_generic_fallback_forms(self):
+        glyphs = {glyph["name"]: glyph for glyph in evaluate_project(self.project)["glyphs"]}
+        reviewed = {
+            "uni0021": "uni0026", "uni003F": "uni0026", "uni0040": "uni0026",
+            "one": "zero", "two": "three", "eight": "zero", "J": "I", "S": "Z",
+            "U": "H", "uni0411": "uni0412", "uni0417": "uni0412", "uni0419": "uni0418",
+            "uni0426": "uni0428", "uni042A": "uni042C", "a": "o", "g": "q",
+            "uni0432": "uni0431", "uni0437": "uni0442", "uni0439": "uni0438",
+            "uni0446": "uni0448", "uni044A": "uni044C",
+        }
+        names = {glyph["name"] for glyph in glyphs.values()}
+        self.assertEqual(len(names), 164)
+        for name, unlike in reviewed.items():
+            with self.subTest(name=name):
+                self.assertIn(name, glyphs)
+                self.assertIn(unlike, glyphs)
+                self.assertNotEqual(glyphs[name]["contours"], glyphs[unlike]["contours"])
+        self.assertEqual(glyphs["acutecomb"]["anchors"]["_top"], (260, 760))
+        self.assertEqual(glyphs["dieresiscomb"]["anchors"]["_top"], (260, 760))
+        self.assertEqual(glyphs["J"]["advance"], 540)
+        self.assertEqual(glyphs["j"]["advance"], 330)
+        self.assertEqual(glyphs["r"]["advance"], 420)
+        for name, unlike in (("V", "X"), ("Y", "X"), ("W", "uni0428"), ("uni0417", "S"), ("uni0437", "s")):
+            self.assertNotEqual(glyphs[name]["contours"], glyphs[unlike]["contours"])
+
+    def test_marks_scale_with_width_and_reverse_rounds_join(self):
+        for width in (.85, 1.15):
+            glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, width=width))["glyphs"]}
+            self.assertEqual(glyphs["acutecomb"]["anchors"]["_top"], (260 * width, 760))
+            self.assertEqual(glyphs["dieresiscomb"]["anchors"]["_top"], (260 * width, 760))
+        for aperture in (0, 1):
+            glyphs = {glyph["name"]: glyph for glyph in evaluate_project(with_controls(self.project, aperture=aperture))["glyphs"]}
+            for name in ("uni042D", "uni044D"):
+                top_bar = glyphs[name]["contours"][1]
+                self.assertEqual(max(point[-2] for point in top_bar if point[0] != "Z"), glyphs[name]["advance"] - 80)
+
+    def test_precomposed_and_combining_dieresis_share_attachment_height(self):
+        glyphs = {glyph["name"]: glyph for glyph in evaluate_project(self.project)["glyphs"]}
+        mark_center = glyphs["dieresiscomb"]["contours"][0][0][-1]
+        mark_anchor = glyphs["dieresiscomb"]["anchors"]["_top"]
+        for base, precomposed, dot_contour in (("uni0415", "uni0401", 4), ("uni0435", "uni0451", 3)):
+            expected_center = glyphs[base]["anchors"]["top"][1] + mark_center - mark_anchor[1]
+            self.assertEqual(glyphs[precomposed]["contours"][dot_contour][0][-1], expected_center)
+
+    def test_reviewed_kerning_exceptions_precede_class_pairs(self):
+        self.assertEqual(kerning_value("A", "V"), -60)
+        self.assertEqual(kerning_value("V", "A"), -60)
+        self.assertEqual(kerning_value("T", "O"), -58)
+        self.assertEqual(kerning_value("T", "a"), -42)
+        self.assertEqual(kerning_value("uni0422", "uni0410"), -54)
+        self.assertEqual(kerning_value("uni0422", "uni0430"), -48)
 
     def test_round_trip_and_rejects_invalid_source(self):
         with tempfile.TemporaryDirectory() as directory:
