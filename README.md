@@ -381,7 +381,10 @@ Technical Sans MVP
 
 ---
 
-# Roadmap
+# Original roadmap (historical proposal)
+
+The current phase state is in `.progressive/project/ROADMAP.md`. The table below records the
+initial research proposal; its phase numbers are not the current PCK execution phases.
 
 | Phase | Результат |
 |---|---|
@@ -442,12 +445,12 @@ Parametric Font Lab может изучать существующие гарн�
 
 # Repository
 
-## Phase 1b: run locally
+## Font workbench: run locally
 
-The implemented workbench generates original Basic Latin, Russian Cyrillic including `Ё/ё`,
-NBSP and acute/dieresis marks from bounded recipes. It provides a browser SVG preview,
-script-aware metrics/kerning, controlled Text/Display presets and static export. From a
-clean macOS/Linux checkout:
+The default workbench now uses **PFL Sans**, a renamed derivative of Inter 4.1 under the
+SIL Open Font License 1.1. It renders real font glyphs in the browser and exposes only the
+source font's native `wght` (100–900) and `opsz` (14–32) axes. Text and Display presets use
+400/14 and 500/32. Export creates a static TTF and WOFF2 from the selected v3 JSON project.
 
 ```sh
 npm run setup
@@ -456,20 +459,27 @@ npm run export
 python3 -m http.server 8765 --bind 127.0.0.1 --directory .
 ```
 
-Open `http://127.0.0.1:8765/web/` for the browser workbench. Adjust the sliders or numeric
-fields, download the resulting project JSON, then compile exactly those settings with:
+Open `http://127.0.0.1:8765/web/` for the new workbench. The original geometric recipe
+experiment remains at `http://127.0.0.1:8765/web/legacy.html`. If the preview WOFF2 fails
+to load, the app shows an error and hides the proof. The v3 project can be downloaded and
+compiled with:
 
 ```sh
-npm run export -- --project /path/to/pfl-phase-1b-project.json
+npm run export -- --project /path/to/pfl-sans-v3-project.json
+.venv/bin/python tools/verify_compiled_proof.py --project /path/to/pfl-sans-v3-project.json
 ```
 
-`requirements.lock` and `package-lock.json` pin the compiler and test dependency graphs.
-Each export writes derived UFO, Designspace, TTF, OTF, WOFF2 and a manifest under
-`build/<source-hash>/`. Exports leave unrelated files in `build/` untouched.
+The verifier prints the absolute path to `proof.html`. Serve `build/` through a local HTTP
+server to inspect the compiled text at 10/14/24/72 px. The build ID binds project JSON to
+the engine, bundled Inter source and browser font bytes. The verifier rejects missing,
+stale or modified binaries and a missing/modified OFL license copy. Inter source provenance
+and SHA-256 are in `vendor/inter/README.md`; the license is in `vendor/inter/LICENSE.txt`
+and copied into each v3 export. See `THIRD_PARTY_NOTICES.md`.
 
-`fontlab/project.json` selects only the bounded Phase 1b repertoire and controls; the original
-contours are deterministically generated locally by `fontlab/recipes.py`. No external font
-outlines are imported. See `THIRD_PARTY_NOTICES.md` for compiler/test dependencies.
+Saved v1 and v2 projects keep their original semantics. Use `fontlab/project-v1.json` or
+`fontlab/project-v2.json` to compile them; v2's SVG workbench is available at `web/legacy.html`.
+No automatic migration converts geometric recipes into Inter outlines. Legacy exports still
+produce UFO, Designspace, TTF, OTF and WOFF2; v3 exports produce static TTF and WOFF2.
 
 https://github.com/Elguajo/Parametric-Font-Lab
 

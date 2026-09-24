@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://parametric-font-lab.local/schema/project-2.json",
+  "title": "Parametric Font Lab type-quality project",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "name", "engine", "axes", "localOverrides", "switches", "metrics", "kerning", "activePreset", "glyphs"],
+  "properties": {
+    "schemaVersion": {"const": 2},
+    "id": {"type": "string", "minLength": 1, "maxLength": 80, "pattern": "^[a-z0-9-]+$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 100},
+    "engine": {"type": "object", "additionalProperties": false, "required": ["id", "version"], "properties": {"id": {"const": "technical-sans"}, "version": {"const": "2.0"}}},
+    "axes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["weight", "width", "xHeight", "roundness", "aperture"],
+      "properties": {
+        "weight": {"type": "number", "minimum": 40, "maximum": 160},
+        "width": {"type": "number", "minimum": 0.85, "maximum": 1.15},
+        "xHeight": {"type": "number", "minimum": 460, "maximum": 540},
+        "roundness": {"type": "number", "minimum": 0, "maximum": 1},
+        "aperture": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "localOverrides": {"type": "object", "additionalProperties": false, "required": ["O"], "properties": {"O": {"type": "object", "additionalProperties": false, "required": ["counter"], "properties": {"counter": {"type": "number", "minimum": 0.5, "maximum": 1.5}}}}},
+    "switches": {"type": "object", "additionalProperties": false, "required": ["aConstruction", "zeroStyle"], "properties": {"aConstruction": {"enum": ["single", "double"]}, "zeroStyle": {"enum": ["plain", "slashed"]}}},
+    "metrics": {"const": {"profile": "technical-proportional-v2"}},
+    "kerning": {"const": {"profile": "script-aware-v2"}},
+    "activePreset": {"enum": ["text", "display", "custom"]},
+    "glyphs": {"const": {"repertoire": "basic-latin-russian-v1"}}
+  }
+}

@@ -1,51 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Parametric Font Lab</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Parametric Font Lab — PFL Sans</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <main class="pfl-modulator">
-    <div class="pfl-modulator__canvas">
-      <nav aria-label="Primary navigation" class="pfl-modulator__navigation">
-        <h1><a class="pfl-modulator__active" href="#workbench">parametric font lab</a></h1>
-        <span id="coverage" class="pfl-modulator__coverage"></span>
-      </nav>
-      <div class="pfl-modulator__content" id="workbench">
-        <aside aria-label="Font controls" class="pfl-left-column">
-          <section class="pfl-card"><h2 class="pfl-card__title">workbench</h2><div class="pfl-card__body">
-            <div class="pfl-controls__row"><span>source</span><span class="pfl-controls__row-value">Latin + Cyrillic</span></div>
-            <div class="pfl-controls__row"><span>export</span><span class="pfl-controls__row-value"><button id="download-project" type="button" disabled>project JSON</button></span></div>
-          </div></section>
-          <form class="pfl-card controls"><h2 class="pfl-card__title">parameters</h2><div class="pfl-card__body">
-            <div class="pfl-controls__options">
-              <div class="pfl-controls__row"><span>setting</span><span class="pfl-controls__row-value"><button id="reset" type="button">reset</button></span></div>
-              <div class="pfl-controls__row"><label for="preset">preset</label><span class="pfl-controls__row-value"><select id="preset"><option value="text">text</option><option value="display">display</option><option value="custom">custom</option></select></span></div>
-            </div>
-            <fieldset class="pfl-controls__group"><legend class="pfl-controls__group-title">dimension</legend><div id="dimension-controls"></div></fieldset>
-            <fieldset class="pfl-controls__group"><legend class="pfl-controls__group-title">proportion</legend><div id="proportion-controls"></div></fieldset>
-            <fieldset class="pfl-controls__group"><legend class="pfl-controls__group-title">shape</legend><div id="shape-controls"></div></fieldset>
-            <fieldset class="pfl-controls__group"><legend class="pfl-controls__group-title">local choices</legend>
-              <div class="pfl-controls__row"><label for="counter-number">O counter</label><span class="pfl-controls__row-value axis-inputs"><input id="counter-number" type="number" min="0.5" max="1.5" step=".01"><input id="counter" type="range" min="0.5" max="1.5" step=".01"></span></div>
-              <div class="pfl-controls__row"><label for="construction">a form</label><span class="pfl-controls__row-value"><select id="construction"><option value="double">double-storey</option><option value="single">single-storey</option></select></span></div>
-              <div class="pfl-controls__row"><label for="zero-style">zero</label><span class="pfl-controls__row-value"><select id="zero-style"><option value="plain">plain</option><option value="slashed">slashed</option></select></span></div>
-            </fieldset>
-            <button id="compare" type="button">capture A / compare B</button><p id="compare-status" class="scope"></p>
-          </div></form>
-        </aside>
-        <section class="pfl-preview-workspace" aria-label="Font previews">
-          <div class="pfl-preview-row">
-            <section class="pfl-preview-card pfl-card" aria-labelledby="glyph-title"><h2 id="glyph-title" class="pfl-card__title">glyph <span id="selected-name"></span></h2><div class="pfl-preview-card__body"><svg id="outline" viewBox="0 -180 820 1100" role="img" aria-label="Selected glyph outline"></svg><div id="glyph-chooser" class="pfl-glyph__chooser" aria-label="Glyph selector"></div></div></section>
-            <section id="glyph-chart" class="pfl-preview-card pfl-card" aria-labelledby="chart-title"><h2 id="chart-title" class="pfl-card__title">chart</h2><div class="pfl-preview-card__body pfl-chart-panel"><div id="chart" class="chart"></div></div></section>
-          </div>
-          <section id="typewriter" class="pfl-typewriter pfl-card" aria-labelledby="typewriter-title"><h2 id="typewriter-title" class="pfl-card__title">typewriter</h2><div class="pfl-card__body"><div class="pfl-typewriter__toolbar"><span>editable source proof</span><span class="specimen-label">size</span></div><textarea id="specimen" class="pfl-typewriter__textarea" rows="3" aria-label="Editable Latin and Cyrillic proof">AVATAR - СТРОКА
-АВНОРСХ ДЛЖКУФЯ ёж AА eе</textarea><div id="specimen-preview" class="specimen-preview"></div><p id="preview-error" class="error" role="alert"></p></div></section>
-        </section>
-      </div>
-    </div>
+  <header class="topbar"><a class="brand" href="./">PFL <span>Font Lab</span></a><span class="edition">PFL Sans · Inter 4.1 foundation</span><a class="legacy" href="./legacy.html">Original geometric experiment ↗</a></header>
+  <main>
+    <section class="hero"><div><p class="eyebrow">A readable starting point</p><h1>Shape text with a<br><em>real typeface.</em></h1><p class="intro">PFL Sans uses the Inter 4.1 outlines and spacing as its foundation. Weight and optical size are native font axes. The browser preview uses the font itself; export makes a static TTF and WOFF2.</p><p class="license">Derived from Inter 4.1 by The Inter Project Authors · SIL Open Font License 1.1 · <a href="../vendor/inter/LICENSE.txt">License and attribution</a></p></div><div class="hero-glyph" id="hero-glyph" aria-hidden="true">Д</div></section>
+    <section class="workspace" aria-label="Font workbench">
+      <aside class="panel controls"><div class="section-heading"><p class="eyebrow">01 / Controls</p><h2>Two real axes</h2></div><label for="preset">Preset</label><select id="preset"><option value="text">Text</option><option value="display">Display</option><option value="custom">Custom</option></select><div class="control"><div><label for="weight">Weight</label><output id="weight-value" for="weight">400</output></div><input id="weight" type="range" min="100" max="900" step="1" value="400"><small>100 Thin <span>900 Black</span></small></div><div class="control"><div><label for="opticalSize">Optical size</label><output id="opticalSize-value" for="opticalSize">14</output></div><input id="opticalSize" type="range" min="14" max="32" step="1" value="14"><small>14 Text <span>32 Display</span></small></div><div class="action-row"><button id="download-project" type="button">Download project JSON</button><a href="../README.md#exporting-a-compiled-proof">Export instructions ↗</a></div><p id="font-status" role="status">Loading PFL Sans…</p></aside>
+      <div class="work-area"><section class="panel specimen-panel"><div class="section-heading"><p class="eyebrow">02 / Live specimen</p><h2>Read it at real sizes</h2></div><label class="visually-hidden" for="specimen">Specimen text</label><textarea id="specimen" rows="3">Слово и форма. Дело, люди, жизнь.
+A better basis for type. bone done, AVATAR.</textarea><div class="proof-list" id="proof-list" aria-label="Specimen at 10, 14, 24, and 72 pixels"></div></section><section class="panel glyph-panel"><div class="section-heading"><p class="eyebrow">03 / Glyphs</p><h2>Actual font glyphs</h2><span id="coverage"></span></div><p class="hint">Choose a character to see its real outline at a larger size. Compare Д / Л and b / ь.</p><div class="featured" id="featured"><span id="selected-glyph">Д</span><div><strong id="selected-label">Д · U+0414</strong><span>Rendered by PFL Sans</span></div></div><div id="chart" class="chart" aria-label="Latin and Russian glyph chart"></div></section></div>
+    </section>
   </main>
-  <script type="module" src="app.js?revision=2"></script>
 </body>
 </html>

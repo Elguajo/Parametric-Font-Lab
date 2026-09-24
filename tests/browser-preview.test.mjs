@@ -10,11 +10,14 @@ try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 850 }, acceptDownloads: true });
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('http://127.0.0.1:8765/web/', { waitUntil: 'networkidle' });
+  await page.goto('http://127.0.0.1:8765/web/legacy.html', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => window.pfl?.glyphs?.length === 164);
   if (await page.locator('.glyph-button').count() !== 164) throw new Error('full Phase 1b chart is incomplete');
   if (await page.locator('.glyph-button svg.chart-glyph').count() !== 164 || await page.locator('.glyph-button svg.chart-glyph path').count() !== 164) throw new Error('glyph chart does not render every generated outline as SVG');
   if (await page.locator('[data-glyph="A"] svg.chart-glyph path').getAttribute('d') !== await page.locator('#outline path').getAttribute('d')) throw new Error('glyph chart outline differs from the current generated A outline');
+  const chartVisibility = await page.locator('[data-glyph="A"] svg.chart-glyph').evaluate(element => ({ display: getComputedStyle(element).display, rect: element.getBoundingClientRect().toJSON() }));
+  if (chartVisibility.display === 'none' || chartVisibility.rect.width <= 0 || chartVisibility.rect.height <= 0) throw new Error('generated chart glyph is not visible');
+  if (!(await page.locator('.compiled-proof-note').textContent()).includes('proof.html')) throw new Error('source and compiled proofs are not distinguished');
   const upright = await page.evaluate(() => {
     const matrix = document.querySelector('#outline g').getScreenCTM();
     const baseline = new DOMPoint(0, 0).matrixTransform(matrix);
@@ -23,7 +26,7 @@ try {
   });
   if (!upright) throw new Error('font-space cap height renders below the baseline in the SVG preview');
   if (await page.locator('#weight-number').inputValue() !== '88') throw new Error('initial numeric control is not synchronized with source state');
-  const sourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json; from fontlab.recipes import evaluate_project, load_project; print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours', 'anchors')} for g in evaluate_project(load_project())['glyphs']]))"], { cwd: resolve('.'), encoding: 'utf8' }));
+  const sourceGlyphs = JSON.parse(execFileSync(python, ['-c', "import json; from pathlib import Path; from fontlab.recipes import evaluate_project, load_project; print(json.dumps([{k: g[k] for k in ('name', 'advance', 'contours', 'anchors')} for g in evaluate_project(load_project(Path('fontlab/project-v2.json')))['glyphs']]))"], { cwd: resolve('.'), encoding: 'utf8' }));
   const previewGlyphs = await page.evaluate(() => window.pfl.glyphs.map(g => {
     const rendered = window.pfl.evalGlyph(g);
     return { name: rendered.name, advance: rendered.advance, contours: rendered.contours, anchors: rendered.anchors };
@@ -53,7 +56,7 @@ try {
   if (exceptionKerning[1] !== '-3.024px' || exceptionKerning[4] !== '-3.456px') throw new Error(`preview exception kerning differs from source: ${exceptionKerning}`);
   await page.locator('#specimen').fill('AV VA TO Ta ТА Та То');
   const reviewedKerning = await page.locator('.glyph').evaluateAll(elements => elements.map(element => element.style.marginLeft));
-  const expectedKerning = new Map([[1, '-4.32px'], [4, '-4.32px'], [7, '-4.176px'], [10, '-3.024px'], [13, '-3.888px'], [16, '-3.456px'], [19, '-3.456px']]);
+  const expectedKerning = new Map([[1, '-3.456px'], [4, '-3.456px'], [7, '-4.176px'], [10, '-3.024px'], [13, '-3.888px'], [16, '-3.456px'], [19, '-3.456px']]);
   for (const [index, value] of expectedKerning) if (reviewedKerning[index] !== value) throw new Error(`preview kerning at glyph ${index} differs from source: ${reviewedKerning}`);
   for (const glyphName of ['B', 'uni0412', 'uni042F']) {
     await page.locator(`[data-glyph="${glyphName}"]`).click();
@@ -79,7 +82,7 @@ try {
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#download-project').click();
   const download = await downloadPromise;
-  if (!download.suggestedFilename().includes('phase-1b')) throw new Error('downloaded project is not versioned as Phase 1b');
+  if (!download.suggestedFilename().includes('v2')) throw new Error('downloaded project is not versioned as v2');
   await page.locator('#specimen').fill('Ж');
   if (await page.locator('#preview-error').textContent()) throw new Error('Cyrillic Ж is absent from preview');
   await page.locator('#specimen').fill('А́ ё');

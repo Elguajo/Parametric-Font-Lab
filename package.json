@@ -5,7 +5,7 @@
   "scripts": {
     "setup": "python3 -m venv .venv && .venv/bin/python -m pip install -r requirements.lock && npm ci && npx playwright install chromium",
     "test:python": ".venv/bin/python -m unittest discover -s tests -v",
-    "test:browser": "node tests/browser-preview.test.mjs",
+    "test:browser": "node tests/inter-browser.test.mjs && node tests/browser-preview.test.mjs",
     "test:export": "node tests/export-routing.test.mjs",
     "test": "npm run test:python && npm run test:browser && npm run test:export",
     "export": "node tools/export-font.mjs"

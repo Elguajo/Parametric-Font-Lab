@@ -1,0 +1,13 @@
+{
+  "activePreset": "text",
+  "axes": {"aperture": 0.58, "roundness": 0.74, "weight": 88, "width": 1.0, "xHeight": 500},
+  "engine": {"id": "technical-sans", "version": "1.0"},
+  "glyphs": {"repertoire": "basic-latin-russian-v1"},
+  "id": "pfl-technical-sans-phase-1b",
+  "kerning": {"profile": "script-aware-v1"},
+  "localOverrides": {"O": {"counter": 1.0}},
+  "metrics": {"profile": "technical-proportional-v1"},
+  "name": "PFL Technical Sans Phase 1b",
+  "schemaVersion": 1,
+  "switches": {"aConstruction": "double", "zeroStyle": "plain"}
+}

@@ -1,0 +1,13 @@
+{
+  "activePreset": "text",
+  "axes": {"aperture": 0.58, "roundness": 0.74, "weight": 88, "width": 1.0, "xHeight": 500},
+  "engine": {"id": "technical-sans", "version": "2.0"},
+  "glyphs": {"repertoire": "basic-latin-russian-v1"},
+  "id": "pfl-technical-sans-type-quality-v2",
+  "kerning": {"profile": "script-aware-v2"},
+  "localOverrides": {"O": {"counter": 1.0}},
+  "metrics": {"profile": "technical-proportional-v2"},
+  "name": "PFL Technical Sans Type Quality v2",
+  "schemaVersion": 2,
+  "switches": {"aConstruction": "double", "zeroStyle": "plain"}
+}

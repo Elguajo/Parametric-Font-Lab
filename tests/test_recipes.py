@@ -12,7 +12,7 @@ from fontlab.recipes import GLYPH_DEFINITIONS, ProjectValidationError, evaluate_
 
 
 class Phase1bRecipeTests(unittest.TestCase):
-    def setUp(self): self.project = load_project()
+    def setUp(self): self.project = load_project(Path("fontlab/project-v1.json"))
 
     def test_repertoire_has_full_basic_latin_russian_and_marks(self):
         cmap = {glyph["unicode"] for glyph in GLYPH_DEFINITIONS}
@@ -84,7 +84,15 @@ class Phase1bRecipeTests(unittest.TestCase):
                     self.assertNotEqual(glyphs["h"]["contours"], glyphs["n"]["contours"])
                     for upper_stem, lower_stem in ((0, 3), (1, 4)):
                         self.assertLessEqual(bounds(glyphs["U"]["contours"][upper_stem])[1], bounds(glyphs["U"]["contours"][lower_stem])[3])
-                    self.assertTrue(all(signed_area < 0 for signed_area in map(area, glyphs["A"]["contours"])))
+                    # Every filled stroke must use the outer-contour winding.
+                    # Otherwise nonzero filling subtracts a diagonal from the
+                    # stem/bar it overlaps, leaving visible white seams.
+                    for name in ("A", "uni0410", "uni0418", "uni041C", "uni041A", "uni0414"):
+                        self.assertTrue(all(signed_area > 0 for signed_area in map(area, glyphs[name]["contours"])), name)
+                    for name in ("O", "uni041E", "zero"):
+                        signed_areas = list(map(area, glyphs[name]["contours"]))
+                        self.assertGreater(signed_areas[0], 0, name)
+                        self.assertLess(signed_areas[1], 0, name)
 
     def test_round_and_open_forms_overshoot_flat_alignment(self):
         for x_height in (460, 500, 540):

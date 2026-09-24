@@ -1,7 +1,8 @@
 # Third-party notices
 
-Phase 1a depends on the following tools only for compilation and browser verification. No
-third-party font outlines, font sources, or UI assets are bundled or used as recipe input.
+The v1/v2 geometric recipe path uses the tools below. The v3 default also bundles Inter 4.1
+font source under SIL OFL 1.1. Its outlines and spacing form PFL Sans; full attribution,
+license and source hash are in `vendor/inter/`. No Metaflop or GPL font geometry is included.
 
 | Package | Pinned version | License | Use |
 | --- | --- | --- | --- |
@@ -13,4 +14,5 @@ third-party font outlines, font sources, or UI assets are bundled or used as rec
 
 The compiler records the resolved `fontTools` version in each build manifest. The full locked
 compiler graph is in `requirements.lock`; the glyph recipes
-in `fontlab/project.json` and their generated outlines are authored in this repository.
+for v1/v2 and their generated outlines are authored in this repository. The v3 project is
+`fontlab/project.json` and uses the licensed Inter source.

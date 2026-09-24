@@ -1,12 +1,26 @@
 # Project Brief — Parametric Font Lab
 
-Status: PHASE 1 COMPLETE; deferred workflow and variable-font decisions remain unscheduled
+Status: Phase 1 historical technical MVP complete; Inter-derived readable foundation complete;
+product-specific differentiation is the next scoped phase.
 
 ## Outcome
-Build an original browser workbench for designing and exporting a high-quality parametric Geometric/Technical Sans with live preview, source presets and production-safe font output. Metaflop Modulator is an interaction reference, not a cloning target.
 
-## First release
-Latin basic and Russian Cyrillic including Ё/ё are one delivered quality gate. The bounded workbench exposes five safe axes, selected local glyph overrides and discrete construction variants. Browser glyph/chart/specimen proofs represent the generated source, and versioned project source compiles into the selected static OTF/TTF/WOFF2 instance. Variable fonts follow only after a separate compatible-master decision. Full Modulator breadth is not a Phase 1 commitment.
+Provide a browser font workbench with a genuinely readable Latin/Russian baseline, honest live
+preview and trustworthy static export. The current default is PFL Sans, a renamed derivative of
+Inter 4.1 under SIL OFL 1.1. Metaflop Modulator remains an interaction reference.
+
+## Current release
+
+The v3 workbench displays actual font glyphs and mixed Latin/Russian text. It exposes native
+weight and optical-size controls, Text/Display presets, a downloadable versioned project and
+static TTF/WOFF2 export. The original 164-glyph geometric recipe workbench remains available
+for v1/v2 saved projects but is not the default readable face. No migration maps its five
+controls to Inter. A production variable-font binary, original custom type design across all
+164 signs and broad Modulator workflow features remain separate future decisions.
 
 ## Constraints
-No copied Metaflop/Bespoke GPL geometry or UI assets; no commercial-font import/morphing. Typographic quality, script fidelity, licensing and deterministic export take priority over arbitrary style breadth. Detailed scope and evidence: `research/font-lab/final/mvp-scope.md` and `research/font-lab/final/RESEARCH_REPORT.md`.
+
+Preserve v1/v2 JSON semantics, license and attribute third-party outlines, and never present a
+fallback system font as a successful proof. The release proof is the selected project's compiled
+binary at 10/14/24/72 px. The default v3 source decision is ADR-012; ADR-011 remains historical
+for the original recipe phase.

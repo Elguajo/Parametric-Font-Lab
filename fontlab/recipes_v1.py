@@ -1,4 +1,4 @@
-"""Versioned original recipe evaluator; it imports no font outlines."""
+"""Original, bounded Phase 1b recipe evaluator; it imports no font outlines."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -50,15 +50,14 @@ def _range(value, limits, label):
     if not isinstance(value,(int,float)) or isinstance(value,bool) or not math.isfinite(value) or not limits[0]<=value<=limits[1]: raise ProjectValidationError(f"{label} must be within {limits[0]}..{limits[1]}")
 def validate_project(p):
     required={"schemaVersion","id","name","engine","axes","localOverrides","switches","metrics","kerning","activePreset","glyphs"}; _keys(p,required,"project")
-    version=p["schemaVersion"]
-    if version not in (1,2) or p["engine"] != {"id":"technical-sans","version":f"{version}.0"}: raise ProjectValidationError("unsupported project version or engine")
+    if p["schemaVersion"] != 1 or p["engine"] != {"id":"technical-sans","version":"1.0"}: raise ProjectValidationError("unsupported project version or engine")
     if not isinstance(p["id"],str) or re.fullmatch(r"[a-z0-9-]{1,80}",p["id"]) is None or not isinstance(p["name"],str) or not 1<=len(p["name"])<=100: raise ProjectValidationError("invalid project identity")
     _keys(p["axes"],set(AXIS_RANGES),"axes")
     for key,limits in AXIS_RANGES.items(): _range(p["axes"][key],limits,key)
     _keys(p["localOverrides"],{"O"},"localOverrides"); _keys(p["localOverrides"]["O"],{"counter"},"localOverrides.O"); _range(p["localOverrides"]["O"]["counter"],(.5,1.5),"O counter")
     _keys(p["switches"],{"aConstruction","zeroStyle"},"switches")
     if p["switches"]["aConstruction"] not in {"single","double"} or p["switches"]["zeroStyle"] not in {"plain","slashed"}: raise ProjectValidationError("invalid switch")
-    if p["metrics"]!={"profile":f"technical-proportional-v{version}"} or p["kerning"]!={"profile":f"script-aware-v{version}"} or p["glyphs"]!={"repertoire":"basic-latin-russian-v1"} or p["activePreset"] not in {*PRESETS,"custom"}: raise ProjectValidationError("unsupported project profile")
+    if p["metrics"]!={"profile":"technical-proportional-v1"} or p["kerning"]!={"profile":"script-aware-v1"} or p["glyphs"]!={"repertoire":"basic-latin-russian-v1"} or p["activePreset"] not in {*PRESETS,"custom"}: raise ProjectValidationError("unsupported Phase 1b profile")
 def load_project(path=None):
     raw=(path or PROJECT_PATH).read_bytes()
     if len(raw)>MAX_SOURCE_BYTES: raise ProjectValidationError(f"project exceeds {MAX_SOURCE_BYTES} bytes")
@@ -178,63 +177,6 @@ def _open_round(a,h,w,r,opening,reverse=False):
     l,right=80,a-80
     if reverse:return [rect(right-w/2,0,right+w/2,h),rect(l+opening,h+12-w,right,h+12),rect(l+opening,-12,right,w-12)]
     return [rect(l-w/2,0,l+w/2,h),rect(l,h+12-w,right-opening,h+12),rect(l,-12,right-opening,w-12)]
-
-def _quality_open_round(a,h,w,opening):
-    """One open, overshooting bowl with a continuous outer and inner edge."""
-    l,terminal=80,a-80-opening
-    outer=l-w*.45; inner=l+w*.55
-    return [[("M",terminal,h+12),
-             ("C",l,h+26,outer,h*.82,outer,h*.5),
-             ("C",outer,h*.18,l,-26,terminal,-12),
-             ("L",terminal,w-12),
-             ("C",l+w*.6,w-12,inner,h*.22,inner,h*.5),
-             ("C",inner,h*.78,l+w*.6,h+12-w,terminal,h+12-w),
-             ("Z",)]]
-
-def _quality_s(a,h,w):
-    l,right,m=80,a-80,a/2
-    curves=[((right-12,h*.87),(m,h+25),(l-12,h*.98),(l,h*.72)),
-            ((l,h*.72),(l-12,h*.54),(m*.68,h*.55),(m,h*.5)),
-            ((m,h*.5),(right+14,h*.43),(right+14,h*.34),(right,h*.25)),
-            ((right,h*.25),(right,-22),(m,-25),(l+12,h*.09))]
-    center=[]
-    for p0,p1,p2,p3 in curves:
-        for step in range(13):
-            if center and step==0:continue
-            t=step/12;u=1-t
-            center.append((u**3*p0[0]+3*u*u*t*p1[0]+3*u*t*t*p2[0]+t**3*p3[0],
-                           u**3*p0[1]+3*u*u*t*p1[1]+3*u*t*t*p2[1]+t**3*p3[1]))
-    outer=[];inner=[]
-    for i,(x,y) in enumerate(center):
-        before=center[max(0,i-1)];after=center[min(len(center)-1,i+1)]
-        dx,dy=after[0]-before[0],after[1]-before[1]
-        length=math.hypot(dx,dy)
-        nx,ny=-dy/length*w/2,dx/length*w/2
-        outer.append((x+nx,y+ny));inner.append((x-nx,y-ny))
-    points=outer+inner[::-1]
-    return [[("M",*points[0]),*(("L",*point) for point in points[1:]),("Z",)]]
-
-def _quality_e(a,h,w,r,opening):
-    l,right=80,a-80
-    return _quality_open_round(a,h,w,opening)+[rect(l+w*.35,h*.49-w*.42,right,h*.49+w*.42)]
-
-def _quality_n(a,h,w):
-    l,right,m=80,a-80,a/2
-    shoulder=[("M",l-w/2,h*.54),
-              ("C",l-w/2,h*.86,m*.65,h+12,m,h+12),
-              ("C",right,h+12,right+w/2,h*.86,right+w/2,h*.54),
-              ("L",right-w/2,h*.54),
-              ("C",right-w/2,h*.78,m,h-w*.9,m,h-w*.9),
-              ("C",l+w/2,h-w*.9,l+w/2,h*.78,l+w/2,h*.54),("Z",)]
-    return [rect(l-w/2,0,l+w/2,h*.54),rect(right-w/2,0,right+w/2,h*.54),shoulder]
-
-QUALITY_BEARINGS={
-    "H":(72,72),"O":(56,56),"A":(38,38),"V":(35,35),"C":(55,43),"S":(48,46),
-    "n":(62,56),"o":(55,55),"b":(64,54),"d":(54,64),"e":(55,48),
-    "Н":(72,72),"О":(56,56),"С":(55,43),"Д":(36,36),"Л":(46,44),"Ж":(34,34),
-    "К":(66,42),"Я":(42,62),"и":(58,58),"н":(62,62),"о":(55,55),"п":(62,62),
-    "б":(53,54),"д":(42,42),"л":(44,42),"е":(55,48),"ь":(62,54),
-}
 
 def _latin_upper_shape(c,a,w,r,p):
     l,right,m=80,a-80,a/2; v=lambda x,y0=0,y1=700:rect(x-w/2,y0,x+w/2,y1); bar=lambda y,x0=l,x1=right:rect(x0,y-w/2,x1,y+w/2)
@@ -376,23 +318,6 @@ def _cyrillic_lower_shape(c,a,h,w,r,p):
     raise ProjectValidationError(f"unreviewed Cyrillic lower {c!r}")
 def _shape(d,p):
     q,c,a,w,r,xh=d["recipe"],chr(d["unicode"]),_advance(d),p["axes"]["weight"],p["axes"]["roundness"],p["axes"]["xHeight"]
-    opening=a*(.07+.12*p["axes"]["aperture"])
-    if c in "CСcс":return _quality_open_round(a,700 if c.isupper() else xh,w,opening)
-    if c=="S":return _quality_s(a,700,min(w,140))
-    if c in "eе":return _quality_e(a,xh,w,r,opening)
-    if c=="ё":return _quality_e(a,xh,w,r,opening)+ring(a*.36,xh+95,w*.5,w*.5,w*.28,r)+ring(a*.64,xh+95,w*.5,w*.5,w*.28,r)
-    if c=="n":return _quality_n(a,xh,w)
-    if c in "oо":return ring(a/2,xh/2,a*.39,xh/2+10,w*.85,r)
-    if c=="b":return [rect(80-w/2,0,80+w/2,700),*ring(a/2,xh*.41,a*.39,xh*.41,w*.85,r)]
-    if c=="d":return [*ring(a/2,xh*.41,a*.39,xh*.41,w*.85,r),rect(a-80-w/2,0,a-80+w/2,700)]
-    if c=="ь":return [rect(80-w/2,0,80+w/2,xh),*ring(a/2,xh*.41,a*.39,xh*.41,w*.85,r)]
-    if c=="б":return [stroke(80,xh*.65,150,700,w*.85),rect(150,700-w*.85/2,a-95,700+w*.85/2),*ring(a*.52,xh*.38,a*.39,xh*.38,w*.85,r)]
-    if c=="Д":
-        l,right,m=80,a-80,a/2
-        return [stroke(l+35,70,m,700,w),stroke(right-35,70,m,700,w),
-                rect(l-22,20,right+22,20+w*.82),rect(l-22-w*.42,-115,l-22+w*.42,20),
-                rect(right+22-w*.42,-115,right+22+w*.42,20)]
-    if c=="Л":return [stroke(80,0,a/2,700,w),stroke(a-80,0,a/2,700,w)]
     if q=="mark-acute":return [stroke(180,720,340,890,w*.5)]
     if q=="mark-dieresis":return ring(180,800,w*.52,w*.52,w*.28,r)+ring(340,800,w*.52,w*.52,w*.28,r)
     if q.startswith("common-") or q=="blank-nbsp":return _common_shape(d["unicode"],a,w,r)
@@ -414,11 +339,10 @@ def _anchors(d,a,p):
 
 KERNING_GROUPS={"public.kern1.Latn.diagonal":["A","V","W","Y"],"public.kern2.Latn.round":["O","C","G","Q","o","c","e"],"public.kern1.Cyrl.diagonal":["uni0410","uni0414","uni041B","uni0423","uni0422","uni0416","uni0425"],"public.kern2.Cyrl.round":["uni041E","uni0421","uni0424","uni042E","uni043E","uni0441","uni044D","uni044E","uni0444"]}
 KERNING_PAIRS={("public.kern1.Latn.diagonal","public.kern2.Latn.round"):-72,("public.kern1.Cyrl.diagonal","public.kern2.Cyrl.round"):-66,("A","V"):-60,("V","A"):-60,("A","W"):-44,("A","Y"):-52,("T","A"):-52,("T","O"):-58,("T","a"):-42,("T","o"):-42,("uni0422","uni0410"):-54,("uni0422","uni0430"):-48,("uni0422","uni043E"):-48}
-QUALITY_KERNING_PAIRS={**KERNING_PAIRS,("public.kern1.Latn.diagonal","public.kern2.Latn.round"):-44,("public.kern1.Cyrl.diagonal","public.kern2.Cyrl.round"):-42,("A","V"):-48,("V","A"):-48}
-def kerning_value(left,right,pairs=KERNING_PAIRS):
-    if (left,right) in pairs:return pairs[(left,right)]
+def kerning_value(left,right):
+    if (left,right) in KERNING_PAIRS:return KERNING_PAIRS[(left,right)]
     lg=[k for k,v in KERNING_GROUPS.items() if k.startswith("public.kern1") and left in v]; rg=[k for k,v in KERNING_GROUPS.items() if k.startswith("public.kern2") and right in v]
-    return next((pairs[(x,y)] for x in lg for y in rg if (x,y) in pairs),0)
+    return next((KERNING_PAIRS[(x,y)] for x in lg for y in rg if (x,y) in KERNING_PAIRS),0)
 def validate_glyph(g):
     if g["advance"]<0 or (g["advance"]==0 and g["metricsClass"]!="mark"):raise ProjectValidationError(f"{g['name']}: invalid advance")
     for contour in g["contours"]:
@@ -439,23 +363,10 @@ def _line_intersects(a,b,c,d):
     u,v,x,y=cross(a,b,c),cross(a,b,d),cross(c,d,a),cross(c,d,b)
     return u*v<0 and x*y<0
 def evaluate_project(p):
-    validate_project(p)
-    if p["schemaVersion"] == 1:
-        from fontlab import recipes_v1
-        return recipes_v1.evaluate_project(p)
-    out=[]
+    validate_project(p); out=[]
     for d in GLYPH_DEFINITIONS:
-        contours=_shape(d,p)
-        advance=_advance(d)
-        c=chr(d["unicode"])
-        if c in QUALITY_BEARINGS:
-            points=[command[i] for contour in contours for command in contour if command[0]!="Z" for i in range(1,len(command),2)]
-            left,right=QUALITY_BEARINGS[c]
-            shift=left-min(points)
-            contours=[[(cmd[0],*(value+shift if i%2==0 else value for i,value in enumerate(cmd[1:]))) if cmd[0]!="Z" else cmd for cmd in contour] for contour in contours]
-            advance=round(max(points)+shift+right)
-        a=round(advance*p["axes"]["width"]); g={**d,"advance":a,"contours":_scale(contours,p["axes"]["width"]),"metricsClass":_metrics_class(d),"anchors":_anchors(d,a,p)}; validate_glyph(g); out.append(g)
-    return {"sourceHash":source_hash(p),"glyphs":out,"kerning":QUALITY_KERNING_PAIRS}
+        a=round(_advance(d)*p["axes"]["width"]); g={**d,"advance":a,"contours":_scale(_shape(d,p),p["axes"]["width"]),"metricsClass":_metrics_class(d),"anchors":_anchors(d,a,p)}; validate_glyph(g); out.append(g)
+    return {"sourceHash":source_hash(p),"glyphs":out,"kerning":KERNING_PAIRS}
 def svg_path(contour):return " ".join(c[0] if c[0]=="Z" else c[0]+" "+" ".join(f"{x:.4f}".rstrip("0").rstrip(".") for x in c[1:]) for c in contour)
 def glyph_signature(g):
     points=[c[-2:] for q in g["contours"] for c in q if c[0] in {"M","L","C"}]
