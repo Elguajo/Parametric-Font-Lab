@@ -80,6 +80,10 @@ For implementation completion use `.progressive/system/QUALITY_PROTOCOL.md`. Ins
 
 Preferred implementations are explicit: **Semble** for intent/semantic discovery, **Serena** for known-symbol navigation/refactor, **RTK** for compact shell output, **Superpowers** for implementation/TDD/debug discipline, **gstack** for challenge/review/browser QA/release checks, **Context7** for fresh library/API docs, and **GitHub Spec Kit** for optional Advanced Spec Mode. Read `.progressive/integrations/TOOL_REGISTRY.json` / `PROFILES.md` only when selecting, checking, installing, or routing tools.
 
+## Mandatory external evidence
+
+Before substantive work, every AI agent must invoke both the Context7 MCP and web search. Use only results relevant to the task and prefer primary/official sources for version-sensitive, security, compatibility, or API claims. If either tool is unavailable or fails, record that fact and continue only with clearly stated limitations; do not silently skip it.
+
 If a preferred tool is absent and materially useful, use `tooling-bootstrap`: verify current official installation docs, explain the benefit/permissions, and request one focused approval before installing or modifying user/global agent configuration. Do not interrupt a tiny task just to install tooling. Installed ≠ loaded ≠ invoked. One discovery question gets one primary route; a second tool must answer a different question, resolve ambiguity, or be fallback.
 
 ## Canonical project state
